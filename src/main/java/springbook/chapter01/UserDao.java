@@ -6,12 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class UserDao {
-
-    private final String DRIVER = "com.mysql.jdbc.Driver";
-    private final String URL = "jdbc:mysql://localhost/springbook?autoReconnect=true&useSSL=false&serverTimezone=UTC";
-    private final String ID = "springbook";
-    private final String PASSWORD = "springbook!@";
+public abstract class UserDao {
 
     public void add(User user) throws ClassNotFoundException , SQLException{
         Connection con = getConnection();
@@ -43,8 +38,5 @@ public class UserDao {
         return user;
     }
 
-    public Connection getConnection() throws SQLException, ClassNotFoundException {
-        Class.forName(DRIVER);
-        return DriverManager.getConnection(URL,ID,PASSWORD);
-    }
+    public abstract Connection getConnection() throws SQLException, ClassNotFoundException;
 }

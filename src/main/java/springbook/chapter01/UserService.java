@@ -2,7 +2,7 @@ package springbook.chapter01;
 
 public class UserService {
     public static void main(String[] args) throws Exception{
-        UserDao dao = new UserDao();
+        UserDao dao = new NUserDao();
 
         User user = new User();
         user.setId("jdalma1");
