@@ -2,7 +2,8 @@ package springbook.chapter01;
 
 public class UserService {
     public static void main(String[] args) throws Exception{
-        UserDao dao = new NUserDao();
+        ConnectionMaker connectionMaker = new DConnectionMaker();
+        UserDao dao = new UserDao(connectionMaker);
 
         User user = new User();
         user.setId("jdalma1");
