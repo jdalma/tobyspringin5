@@ -13,6 +13,7 @@ repositories {
 }
 
 dependencies {
+    implementation("org.springframework:spring-context:5.3.22")
     implementation("org.projectlombok:lombok:1.18.24")
     annotationProcessor("org.projectlombok:lombok:1.18.24")
 }
