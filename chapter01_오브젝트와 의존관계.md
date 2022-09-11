@@ -1,5 +1,7 @@
 # **1_오브젝트와 의존관계**
 
+스프링이란 `어떻게 오브젝트가 설계되고 , 만들어지고 , 어떻게 관계를 맺고 사용되는지에 관심을 갖는 프레임워크`
+
 ## **1.1_초난감 DAO** [예제](https://github.com/jdalma/tobyspringin5/commit/0bc17c916abef092d5ecd2809b10eeb742b3b24b)
 
 - **[자바 빈](https://jdalma.github.io/docs/algorithmTheory/dto/#javabean)**
@@ -380,3 +382,60 @@ public class DaoFactory {
 
 ### 1.8.2 XML을 이용하는 애플리케이션 컨텍스트
 XML에서 빈의 의존관계 정보를 이용한 IoC/DI 작업에는 **GenericXmlApplicationContext**를 사용한다.<br>
+
+
+
+### 1.8.3 DataSource 인터페이스로 변환
+**DataSource 인터페이스 적용**
+- 자바에서는 DB 커넥션을 가져오는 오브젝트의 기능을 추상화해서 비슷한 용도로 사용할 수 있게 만들어진 **DataSource 인터페이스**가 존재한다.
+- 이미 다양한 방법으로 **DB 연결**과 **폴링**기능을 갖춘 많은 DataSource 구현 클래스가 존재한다.
+- DB의 종류나 아이디 , 비밀번호 정도는 지정할 수 있는 방법을 제공한다.
+
+<br>
+
+**자바 코드 설정 방식** [예제](https://github.com/jdalma/tobyspringin5/commit/98a683949ba1c9f50d5557a39937f7787da07205)
+
+```java
+@Configuration
+public class DaoFactory {
+
+    private final String URL = "jdbc:mysql://localhost/springbook?autoReconnect=true&useSSL=false&serverTimezone=UTC";
+    private final String ID = "springbook";
+    private final String PASSWORD = "springbook!@";
+
+    @Bean
+    public UserDao userDao(){
+        UserDao dao = new UserDao();
+        dao.setDataSource(dataSource());
+        return dao;
+    }
+    
+    @Bean
+    public DataSource dataSource(){
+        SimpleDriverDataSource dataSource = new SimpleDriverDataSource();
+
+        dataSource.setDriverClass(com.mysql.jdbc.Driver.class);
+        dataSource.setUrl(URL);
+        dataSource.setUsername(ID);
+        dataSource.setPassword(PASSWORD);
+
+        return dataSource;
+    }
+}
+```
+
+### 1.8.4 프로퍼티 값의 주입
+
+```xml
+<property name="driverClass" value="com.mysql.jdbc.Driver"/>
+<property name="url" value="jdbc:mysql://localhost/springbook?autoReconnect=true&useSSL=false&serverTimezone=UTC"/>
+<property name="username" value="springbook"/>
+<property name="password" value="springbook!@"/>
+```
+
+- `com.mysql.jdbc.Driver` 이렇게 문자열을 주는데 어떻게 속성을 변경할 수 있을까?
+
+```java
+Class driverClass = Class.forName("com.mysql.jdbc.Driver");
+dataSource.setDriver(driverClass);
+```
