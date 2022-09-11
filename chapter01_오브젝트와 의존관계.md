@@ -353,3 +353,30 @@ public class DaoFactory {
 
 3. 일반 메소드를 이용한 주입
    - 한 번에 필요한 모든 파라미터를 다 받아야하는 생성자보다 낫다.
+
+## **1.8 XML을 이용한 설정**
+1. 단순한 텍스트 파일이기 때문에 다루기 쉽다.
+2. 쉽게 이해할 수 있다.
+3. 컴파일과 같은 별도의 빌드 작업이 없다.
+
+### 1.8.1 XML설정
+
+|        | 자바 코드 설정정보              | XML 설정정보             |
+|--------|-------------------------|----------------------|
+| 빈 설정파일 | @Configuration          | <beans>              |
+| 빈의 이름  | @Bean methodName()      | <bean id="methodName"> |
+| 빈의 클래스 | return new BeanClass(); | class="BeanClass"    |
+
+```xml
+<beans>
+    <bean id="connectionMaker" class="springbook.user.daoDConnectionMaker"/>
+    
+    <bean id="userDao" class="springbook.dao.UserDao">
+        <property name="connectionMaker" ref="connectionMaker"/>
+    </bean>
+</beans>
+
+```
+
+### 1.8.2 XML을 이용하는 애플리케이션 컨텍스트
+XML에서 빈의 의존관계 정보를 이용한 IoC/DI 작업에는 **GenericXmlApplicationContext**를 사용한다.<br>
