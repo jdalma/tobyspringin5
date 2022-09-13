@@ -23,10 +23,14 @@ public class UserDaoTest {
         user.setPassword("test");
 
         dao.add(user);
+        assertThat(dao.getCount()).isEqualTo(1);
 
         User findUser = dao.get(user.getId());
 
         assertThat(findUser.getName()).isEqualTo(user.getName());
         assertThat(findUser.getPassword()).isEqualTo(user.getPassword());
+
+        dao.deleteAll();
+        assertThat(dao.getCount()).isEqualTo(0);
     }
 }
