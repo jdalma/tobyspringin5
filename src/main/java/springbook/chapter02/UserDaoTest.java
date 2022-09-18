@@ -17,21 +17,23 @@ public class UserDaoTest {
         ApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
         UserDao dao = context.getBean("userDao" , UserDao.class);
 
-        User user = new User();
-        user.setId("first");
-        user.setName("test");
-        user.setPassword("test");
-
-        dao.add(user);
-        assertThat(dao.getCount()).isEqualTo(1);
-
-        User findUser = dao.get(user.getId());
-
-        assertThat(findUser.getName()).isEqualTo(user.getName());
-        assertThat(findUser.getPassword()).isEqualTo(user.getPassword());
-
         dao.deleteAll();
         assertThat(dao.getCount()).isEqualTo(0);
+
+        User user1 = new User("test1" , "테스트1" , "password1");
+        User user2 = new User("test2" , "테스트2" , "password2");
+
+        dao.add(user1);
+        dao.add(user2);
+        assertThat(dao.getCount()).isEqualTo(2);
+
+        User findUser1 = dao.get(user1.getId());
+        assertThat(findUser1.getName()).isEqualTo(user1.getName());
+        assertThat(findUser1.getPassword()).isEqualTo(user1.getPassword());
+
+        User findUser2 = dao.get(user2.getId());
+        assertThat(findUser2.getName()).isEqualTo(user2.getName());
+        assertThat(findUser2.getPassword()).isEqualTo(user2.getPassword());
     }
 
     @Test
