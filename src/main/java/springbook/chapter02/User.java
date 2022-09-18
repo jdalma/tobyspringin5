@@ -29,6 +29,15 @@ public class User {
         this.password = password;
     }
 
+    public User(String id, String name, String password) {
+        this.id = id;
+        this.name = name;
+        this.password = password;
+    }
+
+    public User() {
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("User{");
