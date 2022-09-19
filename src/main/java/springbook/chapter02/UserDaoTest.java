@@ -4,6 +4,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.dao.EmptyResultDataAccessException;
 
 import java.sql.SQLException;
 
@@ -13,7 +14,7 @@ import static org.assertj.core.api.Assertions.*;
 public class UserDaoTest {
 
     @Test
-    public void addAndGet() throws SQLException {
+    void addAndGet() throws SQLException {
         ApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
         UserDao dao = context.getBean("userDao" , UserDao.class);
 
@@ -37,7 +38,7 @@ public class UserDaoTest {
     }
 
     @Test
-    public void count() throws SQLException {
+    void count() throws SQLException {
         ApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
         UserDao dao = context.getBean("userDao" , UserDao.class);
 
@@ -56,5 +57,18 @@ public class UserDaoTest {
 
         dao.add(user3);
         assertThat(dao.getCount()).isEqualTo(3);
+    }
+
+
+    @Test
+    void getUserFailure() throws SQLException {
+        ApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
+        UserDao dao = context.getBean("userDao" , UserDao.class);
+
+        dao.deleteAll();
+        assertThat(dao.getCount()).isEqualTo(0);
+
+        assertThatThrownBy(() -> dao.get("unknown_id"))
+                .isInstanceOf(EmptyResultDataAccessException.class);
     }
 }
