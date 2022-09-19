@@ -1,22 +1,35 @@
 package springbook.chapter02;
 
-import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import java.sql.SQLException;
 
 import static org.assertj.core.api.Assertions.*;
 
 
+@SpringJUnitConfig(DaoFactory.class)
 public class UserDaoTest {
+
+//    @Autowired
+//    private ApplicationContext context;
+    @Autowired
+    private UserDao dao;
+
+    @BeforeEach
+    void setUp() {
+//        context = new AnnotationConfigApplicationContext(DaoFactory.class);
+//        dao = context.getBean("userDao" , UserDao.class);
+    }
 
     @Test
     void addAndGet() throws SQLException {
-        ApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
-        UserDao dao = context.getBean("userDao" , UserDao.class);
+
 
         dao.deleteAll();
         assertThat(dao.getCount()).isEqualTo(0);
@@ -39,9 +52,6 @@ public class UserDaoTest {
 
     @Test
     void count() throws SQLException {
-        ApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
-        UserDao dao = context.getBean("userDao" , UserDao.class);
-
         User user1 = new User("test1" , "테스트1" , "password1");
         User user2 = new User("test2" , "테스트2" , "password2");
         User user3 = new User("test3" , "테스트3" , "password3");
@@ -62,9 +72,6 @@ public class UserDaoTest {
 
     @Test
     void getUserFailure() throws SQLException {
-        ApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
-        UserDao dao = context.getBean("userDao" , UserDao.class);
-
         dao.deleteAll();
         assertThat(dao.getCount()).isEqualTo(0);
 
