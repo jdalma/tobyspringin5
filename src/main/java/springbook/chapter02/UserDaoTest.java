@@ -3,9 +3,8 @@ package springbook.chapter02;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import java.sql.SQLException;
@@ -14,17 +13,15 @@ import static org.assertj.core.api.Assertions.*;
 
 
 @SpringJUnitConfig(DaoFactory.class)
+@ContextConfiguration(classes = TestDBConfig.class)
 public class UserDaoTest {
 
-//    @Autowired
-//    private ApplicationContext context;
     @Autowired
     private UserDao dao;
 
     @BeforeEach
     void setUp() {
-//        context = new AnnotationConfigApplicationContext(DaoFactory.class);
-//        dao = context.getBean("userDao" , UserDao.class);
+
     }
 
     @Test
