@@ -118,15 +118,97 @@ DB를 업데이트 하는 작업이라는 변하지 않는 **맥락**에서 특�
 - `jdbcContextWithStatementStrategy(StatementStrategy stmt)` → **컨텍스트**
 
 <br>
-**마이크로 DI**<br>
-가장 중요한 개념은 **제3자의 도움을 통해 두 오브젝트 사이의 유연한 관계가 설정되도록 만든다는 것이다.**<br>
-일반적으로 DI는 **4개의 오브젝트 사이에서 일어난다.**
+
+**마이크로 DI**  
+가장 중요한 개념은 **제3자의 도움을 통해 두 오브젝트 사이의 유연한 관계가 설정되도록 만든다는 것이다.**  
+일반적으로 DI는 **4개의 오브젝트 사이에서 일어난다.**  
 1. 의존관계에 있는 두 개의 오브젝트
 2. 이 관계를 다이나믹하게 설정해주는 오브젝트 팩토리 (DI 컨테이너)
-3. 이를 사용하는 클라이언트
+3. 이를 사용하는 클라이언트  
 
-클라이언트와 DI 관계예 있는 두 개의 오브젝트가 모두 하나의 클래스안에 담길 수도 있다. <br>
-이런 경우에는 DI가 매우 작은 단위의 코드와 메소드 사이에서 일어나기도 한다. <br>
-`DI의 장점을 단순화 해서 IoC 컨테이너의 도움 없이 코드 내에서 적용한 경우`를 **마이크로 DI (수동 DI)**라고 한다.
+클라이언트와 DI 관계예 있는 두 개의 오브젝트가 모두 하나의 클래스안에 담길 수도 있다.  
+이런 경우에는 DI가 매우 작은 단위의 코드와 메소드 사이에서 일어나기도 한다.  
+`DI의 장점을 단순화 해서 IoC 컨테이너의 도움 없이 코드 내에서 적용한 경우`를 **마이크로 DI (수동 DI)**라고 한다.  
 
 # **3.3 JDBC 전략 패턴의 최적화**
+
+## 3.3.1 전략 클래스의 추가 `add()` [예제](https://github.com/jdalma/tobyspringin5/commit/8d156bd4d0c151ac91b564deec32fd2485dd6369)
+
+이번엔 `add()`메소드에도 적용해보자  
+
+## 3.3.2 전략과 클라이언트의 동거
+
+위의 전략 패턴에는 
+1. DAO 메소드마다 새로운 `StatementStrategy` 구현 클래스를 만들어야 한다는 점
+2. `StatementStrategy`에 전달한 엔티티의 부가적인 정보를 매번 넘겨줘야 하는 점
+
+같은 불편함이 있다.  
+
+### 새로운 구현 클래스를 매번 만드는 불편함을 내부 클래스로 해결
+
+`StatementStrategy` 전략 클래스를 매번 독립된 파일로 만들지 말고 클래스의 필드를 선언하듯이 `UserDao`안에 내부 클래스로 정의해버리면 해결된다.
+
+```java
+public void add(final User user) throws SQLException{
+     class AddStatement implements StatementStrategy {
+         @Override
+         public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
+             PreparedStatement ps = c.prepareStatement("insert into users(id , name , password) values(?, ?, ?)");
+
+             // 로컬(내부) 클래스의 코드에서 외부의 메소드 로컬 변수에 직접 접근할 수 있다.
+             ps.setString(1 , user.getId());
+             ps.setString(2 , user.getName());
+             ps.setString(3 , user.getPassword());
+
+             return ps;
+         }
+     }
+     // 생성자 파라미터로 User를 전달하지 않아도 된다.
+     jdbcContextWithStatementStrategy(new AddStatement());
+ }
+```
+
+**장점**  
+1. 클래스 파일을 줄일 수 있다.
+2. 내부 클래스의 특징을 이용해 로컬 변수를 바로 가져다 사용할 수 있다.
+
+### 익명 내부 클래스로 내부 클래스의 이름 마저 삭제
+
+익명 내부 클래스는 **선언과 동시에 오브젝트를 생성한다.**  
+이름이 없기 때문에 클래스 자신의 타입을 가질 수 없다.  
+
+```java
+ public void add(final User user) throws SQLException{
+     StatementStrategy st = new StatementStrategy() {
+         @Override
+         public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
+             PreparedStatement ps = c.prepareStatement("insert into users(id , name , password) values(?, ?, ?)");
+
+             ps.setString(1, user.getId());
+             ps.setString(2, user.getName());
+             ps.setString(3, user.getPassword());
+
+             return ps;
+         }
+     };
+     jdbcContextWithStatementStrategy(st);
+ }
+ 
+ // 람다로 변경
+public void add(final User user) throws SQLException{
+     StatementStrategy st = c -> {
+        PreparedStatement ps = c.prepareStatement("insert into users(id , name , password) values(?, ?, ?)");
+
+        ps.setString(1, user.getId());
+        ps.setString(2, user.getName());
+        ps.setString(3, user.getPassword());
+
+        return ps;
+     };
+     jdbcContextWithStatementStrategy(st);
+}
+```
+
+# **3.4 컨텍스트와 DI** 
+
+## 3.4.1 JdbcContext의 분리
