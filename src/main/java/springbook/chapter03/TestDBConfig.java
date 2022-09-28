@@ -9,9 +9,9 @@ import javax.sql.DataSource;
 @Configuration
 public class TestDBConfig {
 
-    private final String URL = "jdbc:mysql://localhost/testdb?autoReconnect=true&useSSL=false&serverTimezone=UTC";
-    private final String ID = "springbook";
-    private final String PASSWORD = "springbook!@";
+    private final String URL = "jdbc:mysql://localhost/springbook?characterEncoding=UTF-8";
+    private final String ID = "spring";
+    private final String PASSWORD = "book";
 
     @Bean
     public UserDao userDao(){
@@ -24,7 +24,7 @@ public class TestDBConfig {
     public DataSource dataSource(){
         SimpleDriverDataSource dataSource = new SimpleDriverDataSource();
 
-        dataSource.setDriverClass(com.mysql.jdbc.Driver.class);
+        dataSource.setDriverClass(com.mysql.cj.jdbc.Driver.class);
         dataSource.setUrl(URL);
         dataSource.setUsername(ID);
         dataSource.setPassword(PASSWORD);
