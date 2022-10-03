@@ -48,6 +48,8 @@ public int getCount() throws SQLException {
 }
 ```
 
+***
+
 # **3.2 변하는 것과 변하지 않는 것**
 
 ## 3.2.1 JDBC `try/catch/finally` 코드의 문제점
@@ -129,6 +131,8 @@ DB를 업데이트 하는 작업이라는 변하지 않는 **맥락**에서 특�
 클라이언트와 DI 관계예 있는 두 개의 오브젝트가 모두 하나의 클래스안에 담길 수도 있다.  
 이런 경우에는 DI가 매우 작은 단위의 코드와 메소드 사이에서 일어나기도 한다.  
 `DI의 장점을 단순화 해서 IoC 컨테이너의 도움 없이 코드 내에서 적용한 경우`를 **마이크로 DI (수동 DI)**라고 한다.  
+
+***
 
 # **3.3 JDBC 전략 패턴의 최적화**
 
@@ -212,3 +216,71 @@ public void add(final User user) throws SQLException{
 # **3.4 컨텍스트와 DI** 
 
 ## 3.4.1 JdbcContext의 분리
+
+위에서 내부 클래스 또는, 익명 내부 클래스, 람다를 적용해 보았다.  
+전략 패턴의 구조로 보자면 `UserDao의 메소드`는 **클라이언트**, `익명 내부 클래스로 만들어지는 것`은 **개별적인 전략**이고, `jdbcContextWithStatementStrategy()`는 **컨텍스트**이다.  
+`jdbcContextWithStatementStrategy()` 메소드를 UserDao클래스 밖으로 독립시켜서 모든 DAO가 사용할 수 있게 해보자.  
+
+### JdbcContext 클래스 추가 [예제](https://github.com/jdalma/tobyspringin5/commit/08383c3a8ee19c345db7ed30869e72a0b8ed5e70)
+
+### 빈 의존관계 변경 [예제](https://github.com/jdalma/tobyspringin5/commit/737b8099e9dce14e9e6e531bf447d45644813508)
+
+![](imgs/ch03_beanDiagram.png)
+
+## 3.4.2 JdbcContext의 특별한 DI ⭐️
+
+위에서 추가한 `JdbcContext`는 인터페이스가 아니고 구체 클래스이다.  
+**스프링의 DI는 기본적으로 인터페이스를 사이에 두고 의존 클래스를 바꿔서 사용하도록 하는게 목적**이다.  
+인터페이스를 사용하지 않았다면 엄밀히 말해서 **온전한 DI**라고 볼 수는 없다.  
+그러나 스프링의 DI는 넓게 보자면 **객체의 생성**과 **관계설정에 대한 제어권한**을 오브젝트에서 제거하고 외부로 위암했다는 `IoC`개념을 포괄한다.  
+스프링 빈을 이용해 UserDao객체에 주입했기 때문에 어느정도 DI의 기본을 따른다고 볼 수 있다.  
+
+이 경우는 `JdbcContext`는 그 자체로 독립적인 **JDBC 컨텍스트**를 제공해주는 서비스 오브젝트로서 의미가 있을 뿐이고 **구현 방법이 바뀔 가능성은 없기 때문에** 그대로 진행했다.  
+그저 인터페이스가 만들기가 귀찮으니까 그냥 클래스를 사용하자는건 잘못된 생각이다.  
+
+### 코드를 이용하는 수동 DI
+
+`JdbcContext`는 `DataSource`를 주입받아야 한다.  
+`DataSource`는 스프링 빈으로 관리되기 때문에 주입받고 싶다면 `JdbcContext`도 빈으로 관리되어야 한다.  
+하지만 **각 DAO마다 하나의 `JdbcContext`객체를 가지고 있게 해야한다면 어떻게 해야할까?**  
+
+아래의 예제와 같이 `JdbcContext`에 대한 제어권을 갖고 **생성과 관리를 담당하는 `UserDao`에게 DI를 맡기면 된다.**  
+
+```java
+public class UserDao {
+
+   private JdbcContext jdbcContext;
+   private DataSource dataSource;
+
+   public void setDataSource(DataSource dataSource) {
+      this.jdbcContext = new JdbcContext();
+      this.jdbcContext.setDataSource(dataSource);
+      
+      this.dataSource = dataSource;
+   }
+   ...
+}
+```
+
+***
+
+# **3.5 템플릿과 콜백**
+
+지금까지 `UserDao`, `StatementStrategy`, `JdbcContext`들을 전략패턴을 적용해 보았다.  
+바뀌지 않는 일정한 패턴을 갖는 작업 흐름이 존재하고 그중 일부분만 자주 바꿔서 사용해야 하는 경우에 적합한 구조다.  
+이런 방식을 스프링에서는 **템플릿/콜백 패턴**이라고 부른다.  
+
+전략 패턴의 **컨텍스트를 `템플릿`**이라고 부르고, 익명 내부 클래스로 만들어지는 **오브젝트를 `콜백`**이라고 부른다.  
+
+> **템플릿**    
+> 어떤 목적을 위해 미리 만들어둔 모양이 있는 **틀**을 가리킨다.  
+> 고정된 틀 안에 바꿀 수 있는 부분을 넣어서 사용하는 경우에 템플릿이라고 부른다.  
+> **템플릿 메소드 패턴**은 `고정된 틀의 로직을 가진 템플릿 메소드를 "슈퍼 클래스"`에 두고, `바뀌는 부분을 "서브 클래스의 메소드"`에 두는 구조로 이뤄진다.
+
+> **콜백**  
+> 실행되는 것을 목적으로 `다른 오브젝트의 메소드에 전달되는 오브젝트`를 말한다.  
+> 파라미터로 전달되지만 값을 참조하기 위한 것이 아니라 `특정 로직을 담은 메소드를 실행시키기 위해 사용한다.`  
+> 자바에선 메소드 자체를 파라미터로 전달할 방법은 없기 때문에 메소드가 담긴 오브젝트를 전달해야 한다.  
+> 그래서 `"함수형 오브젝트 (functional object)"`라고도 한다.  
+
+## 3.5.1 템플릿/콜백의 동작원리
