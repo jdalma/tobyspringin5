@@ -3,6 +3,7 @@ package springbook.chapter03;
 import org.springframework.dao.EmptyResultDataAccessException;
 
 import javax.sql.DataSource;
+import javax.swing.plaf.nimbus.State;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -16,8 +17,16 @@ public class UserDao {
         this.dataSource = dataSource;
     }
 
-    public void add(User user) throws SQLException{
-        StatementStrategy st = new AddStatement(user);
+    public void add(final User user) throws SQLException{
+        StatementStrategy st = c -> {
+            PreparedStatement ps = c.prepareStatement("insert into users(id , name , password) values(?, ?, ?)");
+
+            ps.setString(1, user.getId());
+            ps.setString(2, user.getName());
+            ps.setString(3, user.getPassword());
+
+            return ps;
+        };
         jdbcContextWithStatementStrategy(st);
     }
 
