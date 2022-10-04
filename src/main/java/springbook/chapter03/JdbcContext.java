@@ -41,4 +41,15 @@ public class JdbcContext {
 
         return count;
     }
+
+    public void executeSql(String query) throws SQLException {
+        this.workWithStatementStrategy(
+                new StatementStrategy() {
+                    @Override
+                    public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
+                        return c.prepareStatement(query);
+                    }
+                }
+        );
+    }
 }
