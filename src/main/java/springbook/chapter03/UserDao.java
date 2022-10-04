@@ -3,7 +3,6 @@ package springbook.chapter03;
 import org.springframework.dao.EmptyResultDataAccessException;
 
 import javax.sql.DataSource;
-import javax.swing.plaf.nimbus.State;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -11,10 +10,15 @@ import java.sql.SQLException;
 
 public class UserDao {
 
+    private JdbcContext jdbcContext;
     private DataSource dataSource;
 
     public void setDataSource(DataSource dataSource) {
         this.dataSource = dataSource;
+    }
+
+    public void setJdbcContext(JdbcContext jdbcContext) {
+        this.jdbcContext = jdbcContext;
     }
 
     public void add(final User user) throws SQLException{
@@ -27,7 +31,16 @@ public class UserDao {
 
             return ps;
         };
-        jdbcContextWithStatementStrategy(st);
+        jdbcContext.workWithStatementStrategy(st);
+    }
+
+    public int deleteAll() throws SQLException {
+        return jdbcContext.workWithStatementStrategy(new StatementStrategy() {
+            @Override
+            public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
+                return c.prepareStatement("delete from users");
+            }
+        });
     }
 
     public User get(String id) throws SQLException {
@@ -52,40 +65,6 @@ public class UserDao {
         }
 
         return user;
-    }
-
-    public int deleteAll() throws SQLException{
-        return jdbcContextWithStatementStrategy(new DeleteAllStatement());
-    }
-
-    public int jdbcContextWithStatementStrategy(StatementStrategy stmt) throws SQLException {
-        Connection con = null;
-        PreparedStatement ps = null;
-        int count = 0;
-        try {
-            con = dataSource.getConnection();
-            ps = stmt.makePreparedStatement(con);
-            ps.executeUpdate();
-        } catch (SQLException e){
-            throw e;
-        } finally {
-            if(ps != null){
-                try {
-                    ps.close();
-                } catch (SQLException e) {
-                }
-            }
-            if(con != null){
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                }
-            }
-        }
-        ps.close();
-        con.close();
-
-        return count;
     }
 
     public int getCount() throws SQLException {
