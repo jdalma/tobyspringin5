@@ -28,4 +28,14 @@ class CalculatorTest {
     void multiplyOfNumbers() throws IOException {
         assertThat(calculator.calcMultiply(this.numFilePath)).isEqualTo(24);
     }
+
+    @Test
+    void sumOfNumbers_2() throws IOException {
+        assertThat(calculator.calcSum_2(numFilePath)).isEqualTo(10);
+    }
+
+    @Test
+    void multiplyOfNumbers_2() throws IOException {
+        assertThat(calculator.calcMultiply_2(this.numFilePath)).isEqualTo(24);
+    }
 }
