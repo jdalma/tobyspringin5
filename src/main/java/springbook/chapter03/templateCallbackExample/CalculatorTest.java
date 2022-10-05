@@ -1,19 +1,31 @@
 package springbook.chapter03.templateCallbackExample;
 
-import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class CalculatorTest {
 
+    Calculator calculator;
+    String numFilePath;
+
+    @BeforeEach
+    void setUp() {
+        this.calculator = new Calculator();
+        this.numFilePath = "src/main/java/springbook/chapter03/templateCallbackExample/numbers.txt";
+    }
+
     @Test
-    public void sumOfNumbers() throws IOException {
-        Calculator calculator = new Calculator();
-        String filePath = "src/main/java/springbook/chapter03/templateCallbackExample/numbers.txt";
-        int sum = calculator.calcSum(filePath);
-        assertThat(sum).isEqualTo(10);
+    void sumOfNumbers() throws IOException {
+        assertThat(calculator.calcSum(numFilePath)).isEqualTo(10);
+    }
+
+    @Test
+    void multiplyOfNumbers() throws IOException {
+        assertThat(calculator.calcMultiply(this.numFilePath)).isEqualTo(24);
     }
 }
