@@ -30,7 +30,7 @@ Spring의 클래스 이름이 "Template"으로 끝나거나 인터페이스 이�
 `close()`를 호출하기 전에 예외가 나버리면 **반환**이 되지 않는다.  
 - 예전 토이 프로젝트를 개발할 때 JDBC를 사용하면서 `finally`에서 반환하는 부분을 빼먹은 적이 있었는데,
 - 서버에 요청은 제대로 가는데 DB가 계속 멈춰있었던 기억이 았다.
-- `Connection`과 `Statement`는 **풀(pool)**방식으로 운영되기 때문에 자원을 잘 반납해야 고갈되지 않는다.
+- `Connection`과 `Statement`는 **풀(pool)** 방식으로 운영되기 때문에 자원을 잘 반납해야 고갈되지 않는다.
 
 ```java
 public int getCount() throws SQLException {
@@ -100,7 +100,7 @@ public class UserDaoDeleteAll extends UserDao {
    - 클래스 레벨에서 컴파일 시점에 관계가 결정되어 버린다.
    - 유연성이 떨어진다.
 
-![](imgs/ch03_templateMethodPattern.png)
+![](https://github.com/jdalma/tobyspringin5/blob/main/imgs/ch03_templateMethodPattern.png)
 
 
 ### 전략 패턴의 적용 [예제](https://github.com/jdalma/tobyspringin5/commit/6d06d0a9542b8e594d5c5f4b3f56707aebfa013a)
@@ -108,7 +108,7 @@ public class UserDaoDeleteAll extends UserDao {
 오브젝트를 아예 둘로 분리하고 클래스 레벨에서는 `인터페이스를 통해서만 의존`하도록 만드는 **전략 패턴**이다.
 `확장에 해당하는 변하는 부분을 클래스`로 만들어 **추상화된 인터페이스를 통해 위임하는 방식**이다.  
 
-![](imgs/ch03_strategyPattern.png)
+![](https://github.com/jdalma/tobyspringin5/blob/main/imgs/ch03_strategyPattern.png)
 
 - 변하지 않는 부분이 `contextMethod()` , DB를 업데이트 하는 작업이라는 변하지 않는 **맥락**을 갖는다.
 - `PreparedStatement`를 만들어주는 외부 기능이 바로 **전략 패턴**에서 말하는 **전략**이라고 볼 수 있다.
@@ -121,7 +121,7 @@ DB를 업데이트 하는 작업이라는 변하지 않는 **맥락**에서 특�
 위의 문제를 해결하기 위해 전략 패턴의 실제적인 사용 방법을 좀 더 살펴보자.  
 전략 패턴에 따르면 `Context`가 어떤 전략을 사용하게 할 것인가는 `Context`를 사용하는 앞단의 **Client가 결정하는게 일반적**이다.    
 
-![](imgs/ch03_strategyClient.png)
+![](https://github.com/jdalma/tobyspringin5/blob/main/imgs/ch03_strategyClient.png)
 
 > 1장에서 사용한 방법이다.
 > 컨텍스트가 필요로 하는 전략의 "특정 구현 클래스 오브젝트를 클라이언트가 만들어서 제공해주는 방법"을 사용했다.
@@ -284,7 +284,7 @@ public class UserDao {
 바뀌지 않는 일정한 패턴을 갖는 작업 흐름이 존재하고 그중 일부분만 자주 바꿔서 사용해야 하는 경우에 적합한 구조다.  
 이런 방식을 스프링에서는 **템플릿/콜백 패턴**이라고 부른다.  
 
-전략 패턴의 **컨텍스트를 `템플릿`**이라고 부르고, 익명 내부 클래스로 만들어지는 **오브젝트를 `콜백`**이라고 부른다.  
+전략 패턴의 **컨텍스트를 `템플릿`** 이라고 부르고, 익명 내부 클래스로 만들어지는 **오브젝트를 `콜백`** 이라고 부른다.  
 
 > **템플릿**    
 > 어떤 목적을 위해 미리 만들어둔 모양이 있는 **틀**을 가리킨다.  
@@ -306,15 +306,15 @@ public class UserDao {
 
 하나의 템플릿에서 어려가지 종류의 전략을 사용해야 한다면 **하나 이상의 콜백 오브젝트를 사용할 수도 있다.**  
 
-![](imgs/ch03_templateCallbackFlow.jpeg)
+![](https://github.com/jdalma/tobyspringin5/blob/main/imgs/ch03_templateCallbackFlow.jpeg)
 
 > **클라이언트의 역할**은 템플릿 안에서 실행될 로직을 담은 콜백 오브젝트를 만들고, 콜백이 참조할 정보를 제공하는 것이다.
 > **템플릿**은 전달받은 콜백 오브젝트의 메소드를 호출한다. (콜백의 메소드가 실행되고 결과를 템플릿에게 돌려준다.)
 
 **DI 방식의 전략 패턴 구조**라고 생각하면 간단하다.  
-클라이언트가 템플릿 메소드를 호출하면서 **콜백 오브젝트를 전달하는 것은 `메소드 레벨에서 일어나는 DI`**다.  
+클라이언트가 템플릿 메소드를 호출하면서 **콜백 오브젝트를 전달하는 것은 `메소드 레벨에서 일어나는 DI`** 다.  
 
-![](imgs/ch03_templateCallback.jpeg)
+![](https://github.com/jdalma/tobyspringin5/blob/main/imgs/ch03_templateCallback.jpeg)
 
 
 ## 3.5.2 편리한 콜백의 분리와 재활용
@@ -326,7 +326,7 @@ public class UserDao {
 2. [콜백과 템플릿의 결합](https://github.com/jdalma/tobyspringin5/commit/6b41820490b12dadaec3d30d827e3751a2022df7)
    - 재사용 가능한 `executeSql()`메소드를 `JdbcContext`클래스로 옮기기
 
-![](imgs/ch03_recycleCallback.jpeg)
+![](https://github.com/jdalma/tobyspringin5/blob/main/imgs/ch03_recycleCallback.jpeg)
 
 ## 3.5.3 템플릿/콜백 예제 만들기 ⭐️
 
