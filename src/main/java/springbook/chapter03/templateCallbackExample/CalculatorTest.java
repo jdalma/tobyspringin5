@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import java.io.BufferedReader;
 import java.io.IOException;
 
+import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class CalculatorTest {
@@ -37,5 +38,10 @@ class CalculatorTest {
     @Test
     void multiplyOfNumbers_2() throws IOException {
         assertThat(calculator.calcMultiply_2(this.numFilePath)).isEqualTo(24);
+    }
+
+    @Test
+    void concatenate() throws IOException {
+        assertThat(calculator.concatenate(this.numFilePath)).isEqualTo("1234");
     }
 }

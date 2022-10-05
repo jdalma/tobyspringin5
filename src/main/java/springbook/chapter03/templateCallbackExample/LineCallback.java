@@ -1,6 +1,6 @@
 package springbook.chapter03.templateCallbackExample;
 
-public interface LineCallback {
+public interface LineCallback<T> {
 
-    Integer doSomethingWithLine(String line, Integer value);
+    T doSomethingWithLine(String line, T value);
 }
