@@ -77,6 +77,9 @@ public class UserDaoTest {
     void getAll() throws SQLException {
         dao.deleteAll();
 
+        List<User> empty = dao.getAll();
+        assertThat(empty.size()).isEqualTo(0);
+
         dao.add(user1);
         List<User> users1 = dao.getAll();
         assertThat(users1.size()).isEqualTo(1);
