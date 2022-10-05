@@ -1,8 +1,10 @@
 package springbook.chapter03;
 
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.ResultSetExtractor;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -35,8 +37,6 @@ public class UserDao {
                 return con.prepareStatement("delete from users");
             }
         });
-
-        this.jdbcTemplate.update("delete from users");
     }
 
     public User get(String id) throws SQLException {
@@ -63,18 +63,20 @@ public class UserDao {
         return user;
     }
 
-    public int getCount() throws SQLException {
-        Connection con = dataSource.getConnection();
-        PreparedStatement ps = con.prepareStatement("select count(*) from users");
-
-        ResultSet rs = ps.executeQuery();
-        rs.next();
-        int count = rs.getInt(1);
-
-        rs.close();
-        ps.close();
-        con.close();
-
-        return count;
+    public int getCount() {
+        return this.jdbcTemplate.query(
+            new PreparedStatementCreator() {
+                @Override
+                public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                    return con.prepareStatement("select count(*) from users");
+                }
+            },
+            new ResultSetExtractor<Integer>() {
+                public Integer extractData(ResultSet rs) throws SQLException, DataAccessException {
+                    rs.next();
+                    return rs.getInt(1);
+                }
+            }
+        );
     }
 }

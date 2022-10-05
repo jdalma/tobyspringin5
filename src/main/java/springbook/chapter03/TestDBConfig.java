@@ -16,7 +16,6 @@ public class TestDBConfig {
     @Bean
     public UserDao userDao(){
         UserDao dao = new UserDao();
-        dao.setJdbcContext(jdbcContext());
         dao.setDataSource(dataSource());
         return dao;
     }
