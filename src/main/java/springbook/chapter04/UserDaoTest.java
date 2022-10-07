@@ -2,10 +2,14 @@ package springbook.chapter04;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator;
+import org.springframework.jdbc.support.SQLExceptionTranslator;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
+import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -19,10 +23,29 @@ public class UserDaoTest {
 
     @Autowired
     private UserDao dao;
+    @Autowired
+    private DataSource dataSource;
 
     private final User user1 = new User("test1" , "테스트1" , "password1");
     private final User user2 = new User("test2" , "테스트2" , "password2");
     private final User user3 = new User("test3" , "테스트3" , "password3");
+
+    @Test
+    void duplicateKey() {
+        dao.deleteAll();
+
+
+        try {
+            dao.add(user1);
+            dao.add(user1);
+        } catch (DuplicateKeyException ex) {
+            SQLExceptionTranslator set = new SQLErrorCodeSQLExceptionTranslator(this.dataSource);
+            SQLException sqlEx = (SQLException) ex.getRootCause();
+
+            assertThat(set.translate(null, null, sqlEx))
+                    .isInstanceOf(DuplicateKeyException.class);
+        }
+    }
 
     @Test
     void addAndGet() {
