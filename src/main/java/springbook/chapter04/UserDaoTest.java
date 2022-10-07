@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 public class UserDaoTest {
 
     @Autowired
-    private UserDaoJdbc dao;
+    private UserDao dao;
 
     private final User user1 = new User("test1" , "테스트1" , "password1");
     private final User user2 = new User("test2" , "테스트2" , "password2");
