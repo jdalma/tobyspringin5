@@ -9,6 +9,10 @@ public enum Level {
         this.value = value;
     }
 
+    public int intValue() {
+        return this.value;
+    }
+
     public static Level valueOf(int value) {
         switch (value) {
             case 1: return BASIC;
