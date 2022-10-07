@@ -14,8 +14,8 @@ public class DaoFactory {
     private final String PASSWORD = "book";
 
     @Bean
-    public UserDao userDao(){
-        UserDao dao = new UserDao();
+    public UserDaoJdbc userDao(){
+        UserDaoJdbc dao = new UserDaoJdbc();
         dao.setDataSource(dataSource());
         return dao;
     }

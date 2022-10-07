@@ -18,14 +18,14 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 public class UserDaoTest {
 
     @Autowired
-    private UserDao dao;
+    private UserDaoJdbc dao;
 
     private final User user1 = new User("test1" , "테스트1" , "password1");
     private final User user2 = new User("test2" , "테스트2" , "password2");
     private final User user3 = new User("test3" , "테스트3" , "password3");
 
     @Test
-    void addAndGet() throws SQLException {
+    void addAndGet() {
 
 
         dao.deleteAll();
@@ -48,7 +48,7 @@ public class UserDaoTest {
     }
 
     @Test
-    void count() throws SQLException {
+    void count() {
         dao.deleteAll();
         assertThat(dao.getCount()).isEqualTo(0);
 
@@ -64,7 +64,7 @@ public class UserDaoTest {
 
 
     @Test
-    void getUserFailure() throws SQLException {
+    void getUserFailure() {
         dao.deleteAll();
         assertThat(dao.getCount()).isEqualTo(0);
 
@@ -73,7 +73,7 @@ public class UserDaoTest {
     }
 
     @Test
-    void getAll() throws SQLException {
+    void getAll() {
         dao.deleteAll();
 
         List<User> empty = dao.getAll();
