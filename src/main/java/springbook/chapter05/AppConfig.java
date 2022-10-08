@@ -7,11 +7,18 @@ import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import javax.sql.DataSource;
 
 @Configuration
-public class DaoFactory {
+public class AppConfig {
 
     private final String URL = "jdbc:mysql://localhost/springbook?autoReconnect=true&useSSL=false&serverTimezone=UTC";
     private final String ID = "spring";
     private final String PASSWORD = "book";
+
+    @Bean
+    public UserService userService() {
+        UserService userService = new UserService();
+        userService.setUserDao(userDao());
+        return userService;
+    }
 
     @Bean
     public UserDaoJdbc userDao(){

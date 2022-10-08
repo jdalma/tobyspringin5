@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 
-@SpringJUnitConfig(DaoFactory.class)
+@SpringJUnitConfig(AppConfig.class)
 @ContextConfiguration(classes = TestDBConfig.class)
 public class UserDaoTest {
 
