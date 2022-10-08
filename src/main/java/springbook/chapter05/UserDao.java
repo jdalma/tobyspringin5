@@ -3,9 +3,10 @@ package springbook.chapter05;
 import java.util.List;
 
 public interface UserDao {
-    void add(User user);
+    int add(User user);
+    int update(User user);
     User get(String id);
     List<User> getAll();
-    void deleteAll();
+    int deleteAll();
     int getCount();
 }

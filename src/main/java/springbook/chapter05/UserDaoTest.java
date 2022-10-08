@@ -31,6 +31,26 @@ public class UserDaoTest {
     private final User user3 = new User("test3" , "테스트3" , "password3", Level.GOLD, 100, 40);
 
     @Test
+    void update() {
+        dao.deleteAll();
+
+        dao.add(user1);
+        dao.add(user2);
+
+        user1.setName("수정자1");
+        user1.setPassword("수정자1");
+        user1.setLevel(Level.GOLD);
+        user1.setLogin(1000);
+        user1.setRecommend(999);
+        dao.update(user1);
+
+        User updatedUser1 = dao.get(user1.getId());
+        checkSameUser(user1, updatedUser1);
+        User updatedUser2 = dao.get(user2.getId());
+        checkSameUser(updatedUser2, user2);
+    }
+
+    @Test
     void duplicateKey() {
         dao.deleteAll();
 

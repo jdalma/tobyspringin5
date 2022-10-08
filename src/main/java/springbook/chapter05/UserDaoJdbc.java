@@ -36,13 +36,24 @@ public class UserDaoJdbc implements UserDao {
     };
 
     @Override
+    public int update(User user) {
+        return this.jdbcTemplate.update("update users set name = ?, password = ?, level = ?, login = ?,recommend = ? where id = ?",
+                user.getName(),
+                user.getPassword(),
+                user.getLevel().intValue(),
+                user.getLogin(),
+                user.getRecommend(),
+                user.getId());
+    }
+
+    @Override
     public List<User> getAll() {
         return this.jdbcTemplate.query("select * from users order by id", this.userMapper);
     }
 
     @Override
-    public void add(final User user) {
-        this.jdbcTemplate.update("insert into users(id , name , password , level , login , recommend) values(?, ?, ?, ?, ?, ?)",
+    public int add(final User user) {
+        return this.jdbcTemplate.update("insert into users(id , name , password , level , login , recommend) values(?, ?, ?, ?, ?, ?)",
                                     user.getId(),
                                     user.getName(),
                                     user.getPassword(),
@@ -52,8 +63,8 @@ public class UserDaoJdbc implements UserDao {
     }
 
     @Override
-    public void deleteAll() {
-        this.jdbcTemplate.update("delete from users");
+    public int deleteAll() {
+        return this.jdbcTemplate.update("delete from users");
     }
 
     @Override
