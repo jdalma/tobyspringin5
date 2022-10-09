@@ -1,6 +1,11 @@
 package springbook.chapter05;
 
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.DataSourceUtils;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.jta.JtaTransactionManager;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.sql.Connection;
@@ -16,13 +21,10 @@ public class UserServiceOnlyTest extends UserService {
     }
 
     @Override
-    public void upgradeLevels() throws SQLException {
-        // 트랜잭션 동기화 관리자를 이용해 동기화 작업을 초기화 한다.
-        TransactionSynchronizationManager.initSynchronization();
-
-        // DB 커넥션 생성, 트랜잭션 시작, 이후의 모든 데이터 접근 작업은 이 트랜잭션 안에서 진행된다.
-        Connection c = DataSourceUtils.getConnection(dataSource);
-        c.setAutoCommit(false);
+    public void upgradeLevels() {
+        // 트랜잭션 시작
+        TransactionStatus status =
+                this.transactionManager.getTransaction(new DefaultTransactionDefinition());
 
         try {
             List<User> users = userDao.getAll();
@@ -34,17 +36,10 @@ public class UserServiceOnlyTest extends UserService {
                     userLevelService.upgradeLevel(user);
                 }
             }
-            c.commit();
-        } catch (SQLException ex) {
-            c.rollback();
+            transactionManager.commit(status);
+        } catch (RuntimeException ex) {
+            transactionManager.rollback(status);
             throw ex;
-        } finally {
-            // 스프링 유틸리티 메소드를 이용해 DB 커넥션을 안전하게 닫는다.
-            DataSourceUtils.releaseConnection(c, dataSource);
-
-            // 동기화 작업 종료 및 해제
-            TransactionSynchronizationManager.unbindResource(this.dataSource);
-            TransactionSynchronizationManager.clearSynchronization();
         }
     }
 }

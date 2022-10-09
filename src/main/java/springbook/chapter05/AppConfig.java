@@ -2,6 +2,7 @@ package springbook.chapter05;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 
 import javax.sql.DataSource;
@@ -18,7 +19,7 @@ public class AppConfig {
         UserService userService = new UserService();
         userService.setUserDao(userDao());
         userService.setUserLevelUpgradePolicy(userLevelService());
-        userService.setDataSource(dataSource());
+        userService.setTransactionManager(new DataSourceTransactionManager());
         return userService;
     }
 
