@@ -10,6 +10,7 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringJUnitConfig(AppConfig.class)
@@ -54,6 +55,24 @@ class UserServiceTest {
 
     private void checkLevel(User user, Level expectedLevel) {
         User userUpdate = userDao.get(user.getId());
-        Assertions.assertThat(userUpdate.getLevel()).isEqualTo(expectedLevel);
+        assertThat(userUpdate.getLevel()).isEqualTo(expectedLevel);
+    }
+
+    @Test
+    void add() {
+        userDao.deleteAll();
+
+        User userWithLevel = users.get(4);
+        User userWithoutLevel = users.get(0);
+        userWithLevel.setLevel(null);
+
+        userService.add(userWithLevel);
+        userService.add(userWithoutLevel);
+
+        User userWithLevelRead = userDao.get(userWithLevel.getId());
+        User userWithoutLevelRead = userDao.get(userWithoutLevel.getId());
+
+        assertThat(userWithLevelRead.getLevel()).isEqualTo(userWithLevel.getLevel());
+        assertThat(userWithoutLevelRead.getLevel()).isEqualTo(Level.BASIC);
     }
 }
