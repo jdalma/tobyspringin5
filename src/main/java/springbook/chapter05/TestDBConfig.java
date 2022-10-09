@@ -17,9 +17,16 @@ public class TestDBConfig {
     public UserService userService() {
         UserService userService = new UserService();
         userService.setUserDao(userDao());
+        userService.setUserLevelUpgradePolicy(userLevelService());
         return userService;
     }
 
+    @Bean
+    public UserLevelUpgradePolicy userLevelService() {
+        UserLevelService userLevelService = new UserLevelService();
+        userLevelService.setUserDao(userDao());
+        return userLevelService;
+    }
 
     @Bean
     public UserDao userDao(){
