@@ -18,6 +18,7 @@ public class AppConfig {
         UserService userService = new UserService();
         userService.setUserDao(userDao());
         userService.setUserLevelUpgradePolicy(userLevelService());
+        userService.setDataSource(dataSource());
         return userService;
     }
 

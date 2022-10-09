@@ -37,7 +37,7 @@ class UserServiceTest {
     }
 
     @Test
-    void upgradeLevels() {
+    void upgradeLevels() throws Exception {
         userDao.deleteAll();
 
         for(User user : users) {
@@ -97,7 +97,7 @@ class UserServiceTest {
         try {
             testUserService.upgradeLevels();
             fail("TestUserException expected");
-        } catch (TestUserServiceException e) {
+        } catch (Exception e) {
 
         }
 
