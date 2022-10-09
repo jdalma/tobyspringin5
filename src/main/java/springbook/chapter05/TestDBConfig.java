@@ -14,6 +14,14 @@ public class TestDBConfig {
     private final String PASSWORD = "book";
 
     @Bean
+    public UserService userService() {
+        UserService userService = new UserService();
+        userService.setUserDao(userDao());
+        return userService;
+    }
+
+
+    @Bean
     public UserDao userDao(){
         UserDaoJdbc dao = new UserDaoJdbc();
         dao.setDataSource(dataSource());
