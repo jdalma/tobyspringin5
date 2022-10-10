@@ -26,9 +26,9 @@ public class UserDaoTest {
     @Autowired
     private DataSource dataSource;
 
-    private final User user1 = new User("test1" , "테스트1" , "password1" , Level.BASIC, 1, 0);
-    private final User user2 = new User("test2" , "테스트2" , "password2", Level.SILVER, 55, 10);
-    private final User user3 = new User("test3" , "테스트3" , "password3", Level.GOLD, 100, 40);
+    private final User user1 = new User("test1" , "테스트1" , "password1" , Level.BASIC, 1, 0, "test1");
+    private final User user2 = new User("test2" , "테스트2" , "password2", Level.SILVER, 55, 10, "test2");
+    private final User user3 = new User("test3" , "테스트3" , "password3", Level.GOLD, 100, 40, "test3");
 
     @Test
     void update() {
@@ -42,6 +42,7 @@ public class UserDaoTest {
         user1.setLevel(Level.GOLD);
         user1.setLogin(1000);
         user1.setRecommend(999);
+        user1.setEmail("수정자1");
         dao.update(user1);
 
         User updatedUser1 = dao.get(user1.getId());
@@ -143,5 +144,6 @@ public class UserDaoTest {
         assertThat(user1.getLevel()).isEqualTo(user2.getLevel());
         assertThat(user1.getLogin()).isEqualTo(user2.getLogin());
         assertThat(user1.getRecommend()).isEqualTo(user2.getRecommend());
+        assertThat(user1.getEmail()).isEqualTo(user2.getEmail());
     }
 }
