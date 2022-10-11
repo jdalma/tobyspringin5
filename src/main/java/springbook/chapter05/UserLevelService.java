@@ -1,5 +1,9 @@
 package springbook.chapter05;
 
+import org.springframework.mail.MailSender;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
+
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
@@ -14,9 +18,14 @@ import static springbook.chapter05.UserService.MIN_RECOMMEND_FOR_GOLD;
 public class UserLevelService implements UserLevelUpgradePolicy {
 
     private UserDao userDao;
+    private MailSender mailSender;
 
     public void setUserDao(UserDao userDao) {
         this.userDao = userDao;
+    }
+
+    public void setMailSender(MailSender mailSender) {
+        this.mailSender = mailSender;
     }
 
     public boolean canUpgradeLevel(User user) {
@@ -36,7 +45,7 @@ public class UserLevelService implements UserLevelUpgradePolicy {
     public void upgradeLevel(User user) {
         user.upgradeLevel();
         userDao.update(user);
-        sendUpgradeEmail(user);
+        sendUpgradeEMail(user);
     }
 
     private void sendUpgradeEmail(User user) {
@@ -56,5 +65,15 @@ public class UserLevelService implements UserLevelUpgradePolicy {
         } catch (MessagingException e) {
             e.printStackTrace();
         }
+    }
+
+    private void sendUpgradeEMail(User user) {
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setTo(user.getEmail());
+        mailMessage.setFrom("useradmin@ksug.org");
+        mailMessage.setSubject("Upgrade 안내");
+        mailMessage.setText("사용자님의 등급이 " + user.getLevel().name());
+
+        this.mailSender.send(mailMessage);
     }
 }

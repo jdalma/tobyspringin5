@@ -4,6 +4,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
+import org.springframework.mail.MailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 import javax.sql.DataSource;
 
@@ -27,7 +29,13 @@ public class TestDBConfig {
     public UserLevelUpgradePolicy userLevelService() {
         UserLevelService userLevelService = new UserLevelService();
         userLevelService.setUserDao(userDao());
+        userLevelService.setMailSender(mailSenderImpl());
         return userLevelService;
+    }
+
+    @Bean
+    public MailSender mailSenderImpl() {
+        return new DummyMailSender();
     }
 
     @Bean

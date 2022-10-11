@@ -3,6 +3,7 @@ package springbook.chapter05;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.MailSender;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
@@ -21,6 +22,8 @@ class UserServiceTest {
     private UserService userService;
     @Autowired
     private UserDao userDao;
+    @Autowired
+    private MailSender mailSender;
 
     private List<User> users;
 
@@ -84,6 +87,7 @@ class UserServiceTest {
         UserService testUserService = new UserServiceOnlyTest(users.get(3).getId());
         UserLevelService userLevelService = new UserLevelService();
         userLevelService.setUserDao(this.userDao);
+        userLevelService.setMailSender(this.mailSender);
 
         testUserService.setUserDao(this.userDao);
         testUserService.setUserLevelUpgradePolicy(userLevelService);
