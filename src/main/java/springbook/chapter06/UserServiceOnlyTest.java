@@ -5,7 +5,7 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.util.List;
 
-public class UserServiceOnlyTest extends UserService {
+public class UserServiceOnlyTest extends UserServiceImpl {
 
     private String id;
 
@@ -15,24 +15,14 @@ public class UserServiceOnlyTest extends UserService {
 
     @Override
     public void upgradeLevels() {
-        // 트랜잭션 시작
-        TransactionStatus status =
-                this.transactionManager.getTransaction(new DefaultTransactionDefinition());
-
-        try {
-            List<User> users = userDao.getAll();
-            for(User user : users) {
-                if (user.getId().equals(this.id)) {
-                    throw new TestUserServiceException();
-                }
-                if (userLevelService.canUpgradeLevel(user)) {
-                    userLevelService.upgradeLevel(user);
-                }
+        List<User> users = userDao.getAll();
+        for(User user : users) {
+            if (user.getId().equals(this.id)) {
+                throw new TestUserServiceException();
             }
-            transactionManager.commit(status);
-        } catch (RuntimeException ex) {
-            transactionManager.rollback(status);
-            throw ex;
+            if (userLevelService.canUpgradeLevel(user)) {
+                userLevelService.upgradeLevel(user);
+            }
         }
     }
 }

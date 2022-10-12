@@ -3,10 +3,12 @@ package springbook.chapter06;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.mail.MailSender;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import java.util.Arrays;
 import java.util.List;
@@ -21,11 +23,13 @@ import static springbook.chapter05.UserService.MIN_RECOMMEND_FOR_GOLD;
 class UserServiceTest {
 
     @Autowired
-    private UserService userService;
+    private UserServiceImpl userServiceImpl;
     @Autowired
     private UserDao userDao;
     @Autowired
     private MailSender mailSender;
+    @Autowired
+    private PlatformTransactionManager transactionManager;
 
     private List<User> users;
 
@@ -53,8 +57,8 @@ class UserServiceTest {
         userLevelService.setUserDao(this.userDao);
         userLevelService.setMailSender(mockMailSender);
 
-        userService.setUserLevelUpgradePolicy(userLevelService);
-        userService.upgradeLevels();
+        userServiceImpl.setUserLevelUpgradePolicy(userLevelService);
+        userServiceImpl.upgradeLevels();
 
         checkLevelUpgraded(users.get(0) , false);
         checkLevelUpgraded(users.get(1) , true);
@@ -85,8 +89,8 @@ class UserServiceTest {
         User userWithoutLevel = users.get(0);
         userWithLevel.setLevel(null);
 
-        userService.add(userWithLevel);
-        userService.add(userWithoutLevel);
+        userServiceImpl.add(userWithLevel);
+        userServiceImpl.add(userWithoutLevel);
 
         User userWithLevelRead = userDao.get(userWithLevel.getId());
         User userWithoutLevelRead = userDao.get(userWithoutLevel.getId());
@@ -97,13 +101,17 @@ class UserServiceTest {
 
     @Test
     void upgradeAllOrNothing() {
-        UserService testUserService = new UserServiceOnlyTest(users.get(3).getId());
         UserLevelService userLevelService = new UserLevelService();
         userLevelService.setUserDao(this.userDao);
         userLevelService.setMailSender(this.mailSender);
 
+        UserServiceImpl testUserService = new UserServiceOnlyTest(users.get(3).getId());
         testUserService.setUserDao(this.userDao);
         testUserService.setUserLevelUpgradePolicy(userLevelService);
+
+        UserServiceTx userServiceTx = new UserServiceTx();
+        userServiceTx.setUserService(testUserService);
+        userServiceTx.setTransactionManager(this.transactionManager);
 
         this.userDao.deleteAll();
         for(User user : users) {
@@ -111,7 +119,7 @@ class UserServiceTest {
         }
 
         try {
-            testUserService.upgradeLevels();
+            userServiceTx.upgradeLevels();
             fail("TestUserException expected");
         } catch (Exception e) {
 

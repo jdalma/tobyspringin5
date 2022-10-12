@@ -11,10 +11,10 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.util.Properties;
 
-import static springbook.chapter05.UserService.MIN_LOGIN_COUNT_FOR_SILVER;
-import static springbook.chapter05.UserService.MIN_RECOMMEND_FOR_GOLD;
-
 public class UserLevelService implements UserLevelUpgradePolicy {
+
+    public static final int MIN_LOGIN_COUNT_FOR_SILVER = 50;
+    public static final int MIN_RECOMMEND_FOR_GOLD = 30;
 
     private UserDao userDao;
     private MailSender mailSender;

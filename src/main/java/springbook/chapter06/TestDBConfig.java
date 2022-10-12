@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.mail.MailSender;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
 
@@ -17,10 +18,9 @@ public class TestDBConfig {
 
     @Bean
     public UserService userService() {
-        UserService userService = new UserService();
+        UserServiceImpl userService = new UserServiceImpl();
         userService.setUserDao(userDao());
         userService.setUserLevelUpgradePolicy(userLevelService());
-        userService.setTransactionManager(new DataSourceTransactionManager(dataSource()));
         return userService;
     }
 
@@ -30,6 +30,19 @@ public class TestDBConfig {
         userLevelService.setUserDao(userDao());
         userLevelService.setMailSender(mailSenderImpl());
         return userLevelService;
+    }
+
+    @Bean
+    public UserService userServiceTx() {
+        UserServiceTx userServiceTx = new UserServiceTx();
+        userServiceTx.setUserService(userServiceTx);
+        userServiceTx.setTransactionManager(transactionManager());
+        return userServiceTx;
+    }
+
+    @Bean
+    public PlatformTransactionManager transactionManager() {
+        return new DataSourceTransactionManager(dataSource());
     }
 
     @Bean
