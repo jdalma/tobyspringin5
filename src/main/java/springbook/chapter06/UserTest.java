@@ -41,4 +41,18 @@ class UserTest {
                     .isInstanceOf(IllegalArgumentException.class);
         }
     }
+
+    @Test
+    void simpleProxy() {
+        final String name = "DALMA";
+        Hello hello = new HelloTarget();
+        assertThat(hello.sayHello(name)).isEqualTo("Hello " + name);
+        assertThat(hello.sayHi(name)).isEqualTo("Hi " + name);
+        assertThat(hello.sayThankYou(name)).isEqualTo("Thank You " + name);
+
+        Hello proxiedHello = new HelloUppercase(hello);
+        assertThat(proxiedHello.sayHello(name)).isEqualTo("HELLO " + name);
+        assertThat(proxiedHello.sayHi(name)).isEqualTo("HI " + name);
+        assertThat(proxiedHello.sayThankYou(name)).isEqualTo("THANK YOU " + name);
+    }
 }
