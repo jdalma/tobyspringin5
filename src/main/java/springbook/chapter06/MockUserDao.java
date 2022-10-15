@@ -1,12 +1,13 @@
 package springbook.chapter06;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MockUserDao implements UserDao {
     private List<User> users;
-    private List<User> updated;
+    private List<User> updated = new ArrayList<>();
 
-    private MockUserDao(List<User> users) {
+    public MockUserDao(List<User> users) {
         this.users = users;
     }
 
