@@ -27,7 +27,7 @@ public class TestDBConfig {
     @Bean
     public UserService userServiceTx() {
         UserServiceTx userServiceTx = new UserServiceTx();
-        userServiceTx.setUserService(userServiceTx);
+        userServiceTx.setUserService(userService());
         userServiceTx.setTransactionManager(transactionManager());
         return userServiceTx;
     }
