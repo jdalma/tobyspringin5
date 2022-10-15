@@ -20,16 +20,8 @@ public class AppConfig {
     public UserService userService() {
         UserServiceImpl userService = new UserServiceImpl();
         userService.setUserDao(userDao());
-        userService.setUserLevelUpgradePolicy(userLevelService());
+        userService.setMailSender(mailSenderImpl());
         return userService;
-    }
-
-    @Bean
-    public UserLevelUpgradePolicy userLevelService() {
-        UserLevelService userLevelService = new UserLevelService();
-        userLevelService.setUserDao(userDao());
-        userLevelService.setMailSender(mailSenderImpl());
-        return userLevelService;
     }
 
     @Bean

@@ -53,11 +53,7 @@ class UserServiceTest {
             userDao.add(user);
         }
         MockMailSender mockMailSender = new MockMailSender();
-        UserLevelService userLevelService = new UserLevelService();
-        userLevelService.setUserDao(this.userDao);
-        userLevelService.setMailSender(mockMailSender);
-
-        userServiceImpl.setUserLevelUpgradePolicy(userLevelService);
+        userServiceImpl.setMailSender(mockMailSender);
         userServiceImpl.upgradeLevels();
 
         checkLevelUpgraded(users.get(0) , false);
@@ -101,13 +97,9 @@ class UserServiceTest {
 
     @Test
     void upgradeAllOrNothing() {
-        UserLevelService userLevelService = new UserLevelService();
-        userLevelService.setUserDao(this.userDao);
-        userLevelService.setMailSender(this.mailSender);
-
         UserServiceImpl testUserService = new UserServiceOnlyTest(users.get(3).getId());
         testUserService.setUserDao(this.userDao);
-        testUserService.setUserLevelUpgradePolicy(userLevelService);
+        testUserService.setMailSender(this.mailSender);
 
         UserServiceTx userServiceTx = new UserServiceTx();
         userServiceTx.setUserService(testUserService);

@@ -20,8 +20,8 @@ public class UserServiceOnlyTest extends UserServiceImpl {
             if (user.getId().equals(this.id)) {
                 throw new TestUserServiceException();
             }
-            if (userLevelService.canUpgradeLevel(user)) {
-                userLevelService.upgradeLevel(user);
+            if (canUpgradeLevel(user)) {
+                upgradeLevel(user);
             }
         }
     }
