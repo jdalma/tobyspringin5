@@ -118,7 +118,7 @@ DB를 사용하였을 때의 테스트 시간은 **803ms**<br>
 파라미터를 직접 비교하기 보다는 파라미터의 내부 정보를 확인해야 하는 경우 `ArgumentCaptor`사용하면 유용하다.
 
 
-# **6.3 다이내믹 프록시와 팩토리 빈** ⭐️
+# **6.3 다이내믹 프록시와 팩토리 빈** ⭐⭐⭐️
 
 단순히 확장성을 고려해서 한 가지 기능을 분리한다면 전형적인 전략 패턴을 사용하면 된다.  
 **트랜잭션 기능에는 추상화 작업을 통해 이미 전략 패턴이 적용되어 있다.**  
@@ -229,4 +229,151 @@ public static void main(String[] args) throws NoSuchMethodException, InvocationT
 1. 인터페이스의 모든 메소드를 구현해 타깃에게 위임하도록 만들어야한다.
 2. 부가기능인 리턴 값을 대문자로 바꾸는 기능이 모든 메소드에 중복돼서 나타난다.
 
-### 다이나믹 프록시 적용
+### 다이나믹 프록시 적용 [예제](https://github.com/jdalma/tobyspringin5/commit/35095f89b068c2a9009007c3ac44ac43b43313c8)
+
+`HelloUppercase`를 **다이내믹 프록시**로 만들어보자.  
+
+![](imgs/ch06_dynamicProxy.png)
+
+**다이내믹 프록시**는 **프록시 팩토리**에 의해 런타임시 다이내믹하게 타깃의 인터페이스와 같은 타입으로 만들어지는 오브젝트다.  
+클라이언트는 다이내믹 프록시 오브젝트를 타깃 인터페이스를 통해 사용할 수 있다.  
+이 덕분에 프록시를 만들 때 인터페이스를 모두 구현해가면서 클래스를 정의하는 수고를 덜 수 있다.  
+- **프록시 팩토리**에게 인터페이스 정보만 제공하면 해당 인터페이스를 구현한 클래스의 오브젝트를 자동으로 만들어주기 때문이다.
+
+프록시로서 필요한 부가기능 제공 코도는 직접 작성해야 한다.  
+부가기능은 프록시 오브젝트와 독립적으로 `InvocationHandler`를 구현한 오브젝트에 담는다.  
+- `InvocationHandler` : 아래와 같이 메소드 한 개만 가진 인터페이스다.
+
+```java
+/**
+ * InvocationHandler 는 프록시 인스턴스의 호출 핸들러 에 의해 구현된 인터페이스입니다.
+ * 각 프록시 인스턴스에는 연관된 호출 핸들러가 있습니다. 
+ * 프록시 인스턴스에서 메서드가 호출되면 메서드 호출이 인코딩되어 해당 호출 핸들러의 invoke 메서드로 전달됩니다.
+ */
+public interface InvocationHandler {
+   /**
+    * 프록시 인스턴스에서 메서드 호출을 처리하고 결과를 반환합니다. 
+    * 이 메서드는 연결된 프록시 인스턴스에서 메서드가 호출될 때 호출 핸들러에서 호출됩니다.
+    */
+    public Object invoke(Object proxy, Method method, Object[] args)
+        throws Throwable;
+}
+```
+
+- `invoke()`는 리플렉션의 `Method`인터페이스를 파라미터로 받는다.
+- 메소드를 호출할 때 전달되는 파라미터도 `args`로 받는다.
+
+**다이내믹 프록시 오브젝트**는 `클라이언트의 모든 요청을 리플렉션 정보로 변환`해서 **`InvocationHandler`구현 오브젝트**의 `invoke()`메소드로 넘기는 것이다.  
+**`InvocationHandler` 구현 오브젝트**가 `타깃 오브젝트 레퍼런스를 갖고 있다면 리플렉션을 이용해 간단히 위임 코드를 만들어 낼 수 있다.`  
+
+![](imgs/ch06_invocationHandler.jpeg)
+
+1. `Hello` 인터페이스를 제공하면서 프록시 팩토리에게 다이내믹 프록시를 만들어 달라고 요청
+2. 모든 메소드를 구현한 오브젝트를 생성
+3. 다이내믹 프록시가 받는 모든 요청을 `InvocationHandler`의 `invoke(Method)`로 보낸다
+
+
+```java
+Hello dynamicProxiedHello = (Hello) Proxy.newProxyInstance(
+       getClass().getClassLoader(),    // 1. 동적으로 생성되는 다이내믹 프록시 클래스의 로딩에 사용할 클래스 로더
+       new Class[] {Hello.class},      // 2. 구현할 인터페이스
+       new UppercaseHandler(new HelloTarget()));   // 3. 부가기능과 위임 코드를 담은 InvocationHandler
+
+assertThat(dynamicProxiedHello.sayHello(name)).isEqualTo("HELLO " + name);
+assertThat(dynamicProxiedHello.sayHi(name)).isEqualTo("HI " + name);
+assertThat(dynamicProxiedHello.sayThankYou(name)).isEqualTo("THANK YOU " + name);
+```
+
+사용 방법을 자세히보자
+1. 다이내믹 프록시가 정의되는 클래스 로더를 지정하는 것 🚩
+2. 다이내믹 프록시가 구현해야 할 인터페이스
+   1. 한 번에 하나 이상의 인터페이스를 구현할 수도 있다.
+3. 부가기능과 위임관련 코드를 담고 있는 **`InvocationHandler` 구현 오브젝트**
+
+
+## 다이내믹 프록시의 확장 [예제](https://github.com/jdalma/tobyspringin5/commit/060bdc3213eaff95e2b509e59025e38c0283c1dc)
+
+`UppercaseHandler`는 모든 메소드의 리턴 타입이 스트링이라고 가정한다.    
+**스트링 외의 리턴 타입을 갖는 메소드가 추가되면 어떨까?**  
+
+리플렉션은 매우 유연하고 막강한 기능을 가진 대신에 주의 깊게 사용할 필요가 있다.  
+그래서 **`Method`를 이용한 타깃의 오브젝트의 메소드 호출 후 리턴 타입을 확인**해서 스트링인 경우만 대문자로 바꿔주고 나머지는 그대로 리턴하는 방식으로 수정하자.  
+
+> `InvocationHandler`는 단일 메소드 `invoke()`에서 모든 요청을 처리하기 때문에 어떤 메소드에 어떤 기능을 적용할지를 선택하는 과정이 필요할 수도 있다.
+> 
+> 호출하는 메소드의 이름, 파라미터의 개수와 타입, 리턴 타입 등의 정보를 가지고 부가적인 기능을 적용할 메소드를 선택할 수 있다.
+
+## 다이내믹 프록시를 이용한 트랜잭션 부가기능 ⭐️ [예제](https://github.com/jdalma/tobyspringin5/commit/2c56adc3ea824f3238d9d9c8cdc3f70b18a5377d)
+
+드디어 **`UserServiceTx`를 다이내믹 프록시 방식으로 변경해보자**  
+**다이내믹 프록시**와 연동해서 **트랜잭션 기능을 부가해주는 `InvocationHandler`**는 한 개만 정의해도 충분하다.    
+
+> 리플렉션 메소드인 `invoke()`를 이용해 타깃 오브젝트의 메소드를 호출할 때는 타깃 오브젝트에서 발생하는 예외가 `InvocationTargetException`으로 한 번 포장돼서 전달된다.
+> 
+> 따라서 `InvocationTargetException`으로 받은 후 `getTargetException()` 메소드로 중첩되어 있는 예외를 가져와야 한다.
+
+## 다이내믹 프록시를 위한 팩토리 빈 ⭐
+
+이제 `TransactionHandler`와 **다이내믹 프록시**를 **스프링의 DI를 통해 사용할 수 있도록** 만들어야 한다.  
+**다이내믹 프록시 오브젝트는 일반적인 스프링의 빈으로는 등록할 방법이 없다..**
+- 스프링의 빈은 기본적으로 **클래스 이름과 프로퍼티로 정의된다.**
+- **지정된 클래스의 이름을 가지고 리플렉션을 이용해서 해당 클래스의 오브젝트를 만든다.**
+- 스프링은 내부적으로 리플렉션 API를 사용해서 빈 정의에 나오는 클래스 이름을 가지고 Bean 오브젝트를 생성한다.
+
+문제는 다이내믹 프록시 오브젝트는 이런 식으로 프록시 오브젝트가 생성되지 않는다는 점이다.  
+**사전에 프록시 오브젝트의 클래스 정보를 미리 알아내서 스프링의 빈에 정의할 방법이 없다.**  
+- `Proxy`는 `Proxy.newInstance()`라는 스태틱 팩토리 메소드를 통해서만 만들 수 있다.
+
+### **팩토리 빈**
+
+스프링은 클래스 정보를 가지고 디폴트 생성자를 통해 오브젝트를 만드는 방법 외에도 빈을 만드는 방벙을 제공한다.  
+**대표적으로 팩토리 빈을 이용한 생성 방법이다.**  
+
+**팩토리 빈이란?**
+- 스프링을 대신해서 오브젝트의 생성로직을 담당하도록 만들어진 특별한 빈을 말한다.
+- 전형적인 팩토리 메소드를 가진 오브젝트다. 
+- **스프링은 `FactoryBean` 인터페이스를 구현한 클래스가 Bean의 클래스로 지정되면 팩토리 빈 클래스의 오브젝트의 `getObject()`를 통해 오브젝트를 가져오고, 이를 빈 오브젝트로 사용한다.**
+  - Bean 오브젝트를 생성하는 과정에서만 사용될 뿐이다.
+  
+팩토리 빈을 만드는 가장 간단한 방법은 **스프링의 `FactoryBean` 인터페이스를 구현**하는 것이다.  
+
+```java
+public interface FactoryBean<T> {
+	String OBJECT_TYPE_ATTRIBUTE = "factoryBeanObjectType";
+
+	@Nullable
+	T getObject() throws Exception;
+
+	@Nullable
+	Class<?> getObjectType();
+
+	default boolean isSingleton() {
+		return true;
+	}
+}
+```
+- [`Spring docs` FactoryBean](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/beans/factory/FactoryBean.html)
+
+> **`FactoryBean` 인터페이스를 구현한 클래스를 스프링의 빈으로 등록하면 팩토리 빈으로 동작한다.**
+
+### 팩토리 빈 학습 테스트 [예제](https://github.com/jdalma/tobyspringin5/commit/9238c441028b72d26be669418ef0785beec80c8d)
+
+스프링은 `private`생성자를 가진 클래스도 리플렉션을 이용하여 오브젝트를 만들어준다.  
+하지만 일반적으로 `private`생성자를 가진 클래스를 빈으로 등록하는 일은 권장되지 않으며, 등록하더라도 올바르게 동작하지 않을 가능성이 있다.  
+클래스에 **스태틱 팩토리 메소드**를 추가하여 `private`생성자를 사용하지 않고 오브젝트를 생성해주는 **팩토리 빈 클래스를 만들어보자**  
+
+> 드물지만 팩토리 빈이 만들어주는 빈 오브젝트가 아니라 **팩토리 빈 자체를 가져오고 싶을 수 있다.**
+> 
+> 이럴 때를 위해 스프링은 `&`를 빈 이름앞에 붙여주면 팩토리 빈 자체를 돌려준다.
+
+
+## 트랜잭션 프록시를 팩토리 빈을 통해 스프링 빈으로 등록 [예제](https://github.com/jdalma/tobyspringin5/commit/eaad41017bb3955971107e40a079bf1b9c03736b) ⭐
+
+`Proxy.newProxyInstance()`를 통해서만 생성이 가능한 다이내믹 프록시 오브젝트는 일반적인 방법으로는 스프링의 빈으로 등록할 수 없다.  
+위에서 학습하였듯이 **팩토리 빈의 `getObject()`에서 다이내믹 프록시 오브젝트를 생성하여 주면 스프링 빈으로 등록이 가능하다.**  
+
+![](imgs/ch06_factoryBeanDynamicProxy.jpeg)
+
+
+테스트 코드 작성 시 이와 같은 경우 이미 스프링 빈으로 만들어진 트랜잭션 프록시 오브젝트의 타깃을 변경해주기는 어렵다.  
+`TxProxyFactoryBean`를 직접 가져와서 `target` 프로퍼티를 테스트 대상으로 재구성한 뒤에 프록시 오브젝트를 생성하도록 하자.  
