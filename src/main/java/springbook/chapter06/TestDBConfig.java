@@ -17,7 +17,7 @@ public class TestDBConfig {
     private final String PASSWORD = "book";
 
     @Bean
-    public UserService userService() {
+    public UserService userServiceImpl() {
         UserServiceImpl userService = new UserServiceImpl();
         userService.setUserDao(userDao());
         userService.setMailSender(mailSenderImpl());
@@ -25,12 +25,15 @@ public class TestDBConfig {
     }
 
     @Bean
-    public UserService userServiceTx() {
-        UserServiceTx userServiceTx = new UserServiceTx();
-        userServiceTx.setUserService(userService());
-        userServiceTx.setTransactionManager(transactionManager());
-        return userServiceTx;
+    public TxProxyFactoryBean userService() {
+        TxProxyFactoryBean proxyFactoryBean = new TxProxyFactoryBean();
+        proxyFactoryBean.setTarget(userServiceImpl());
+        proxyFactoryBean.setTransactionManager(transactionManager());
+        proxyFactoryBean.setPattern("upgradeLevels");
+        proxyFactoryBean.setServiceInterface(UserService.class);
+        return proxyFactoryBean;
     }
+
 
     @Bean
     public PlatformTransactionManager transactionManager() {
