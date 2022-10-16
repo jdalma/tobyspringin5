@@ -6,6 +6,7 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.mail.MailSender;
 import org.springframework.transaction.PlatformTransactionManager;
+import springbook.chapter06.factoryBean.MessageFactoryBean;
 
 import javax.sql.DataSource;
 
@@ -40,6 +41,13 @@ public class AppConfig {
     @Bean
     public MailSender mailSenderImpl() {
         return new DummyMailSender();
+    }
+
+    @Bean
+    public MessageFactoryBean messageFactoryBean() {
+        MessageFactoryBean messageFactoryBean = new MessageFactoryBean();
+        messageFactoryBean.setText("Factory Bean");
+        return messageFactoryBean;
     }
 
     @Bean
