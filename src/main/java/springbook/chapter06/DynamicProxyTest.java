@@ -4,12 +4,18 @@ import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.springframework.aop.ClassFilter;
+import org.springframework.aop.Pointcut;
 import org.springframework.aop.framework.ProxyFactoryBean;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.aop.support.NameMatchMethodPointcut;
 
+import java.awt.*;
+import java.lang.instrument.ClassFileTransformer;
 import java.lang.reflect.Proxy;
 import java.util.Locale;
+
+import static org.assertj.core.api.Assertions.*;
 
 public class DynamicProxyTest {
 
@@ -22,7 +28,7 @@ public class DynamicProxyTest {
                 new UppercaseHandler(new HelloTarget())
         );
 
-        Assertions.assertThat(proxiedHello.sayHello("test")).isEqualTo("HELLO TEST");
+        assertThat(proxiedHello.sayHello("test")).isEqualTo("HELLO TEST");
     }
 
     @Test
@@ -35,7 +41,7 @@ public class DynamicProxyTest {
 
         // FactoryBean이므로 getObject()로 생성된 프록시를 가져온다
         Hello proxiedHello = (Hello) pfBean.getObject();
-        Assertions.assertThat(proxiedHello.sayHello("test")).isEqualTo("HELLO TEST");
+        assertThat(proxiedHello.sayHello("test")).isEqualTo("HELLO TEST");
     }
 
     static class UppercaseAdvice implements MethodInterceptor {
@@ -63,8 +69,54 @@ public class DynamicProxyTest {
 
         Hello proxiedHello = (Hello) pfBean.getObject();
 
-        Assertions.assertThat(proxiedHello.sayHi("test")).isEqualTo("HI TEST");
-        Assertions.assertThat(proxiedHello.sayHello("test")).isEqualTo("HELLO TEST");
-        Assertions.assertThat(proxiedHello.sayThankYou("test")).isEqualTo("Thank You test");
+        assertThat(proxiedHello.sayHi("test")).isEqualTo("HI TEST");
+        assertThat(proxiedHello.sayHello("test")).isEqualTo("HELLO TEST");
+        assertThat(proxiedHello.sayThankYou("test")).isEqualTo("Thank You test");
+    }
+
+    @Test
+    void classNamePointcutAdvisor() {
+        // 포인트컷 준비
+        NameMatchMethodPointcut classMethodPointcut = new NameMatchMethodPointcut() {
+            @Override
+            public ClassFilter getClassFilter() {
+                return new ClassFilter() {
+                    @Override
+                    public boolean matches(Class<?> clazz) {
+                        // 클래스 이름이 HelloT로 시작하는 것만
+                        return clazz.getSimpleName().startsWith("HelloT");
+                    }
+                };
+            }
+        };
+
+        // 메소드 이름이 SayH로 시작하는 것만
+        classMethodPointcut.setMappedName("sayH*");
+
+        checkAdvice(new HelloTarget(), classMethodPointcut, true);
+
+        class HelloWorld extends HelloTarget {};
+        checkAdvice(new HelloWorld(), classMethodPointcut, false);
+
+        class HelloToby extends HelloTarget {};
+        checkAdvice(new HelloToby(), classMethodPointcut, true);
+    }
+
+    private void checkAdvice(Object target, Pointcut pointcut, boolean adviced) {
+        ProxyFactoryBean pfBean = new ProxyFactoryBean();
+        pfBean.setTarget(target);
+        pfBean.addAdvisor(new DefaultPointcutAdvisor(pointcut, new UppercaseAdvice()));
+
+        Hello proxiedHello = (Hello) pfBean.getObject();
+        if (adviced) {
+            assertThat(proxiedHello.sayHello("Toby")).isEqualTo("HELLO TOBY");
+            assertThat(proxiedHello.sayHi("Toby")).isEqualTo("HI TOBY");
+            assertThat(proxiedHello.sayThankYou("Toby")).isEqualTo("Thank You Toby");
+        }
+        else {
+            assertThat(proxiedHello.sayHello("Toby")).isEqualTo("Hello Toby");
+            assertThat(proxiedHello.sayHi("Toby")).isEqualTo("Hi Toby");
+            assertThat(proxiedHello.sayThankYou("Toby")).isEqualTo("Thank You Toby");
+        }
     }
 }
