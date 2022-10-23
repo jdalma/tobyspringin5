@@ -21,23 +21,11 @@ public class AppConfig {
     private final String PASSWORD = "book";
 
     @Bean
-    public UserService userServiceImpl() {
+    public UserService userService() {
         UserServiceImpl userService = new UserServiceImpl();
         userService.setUserDao(userDao());
         userService.setMailSender(mailSenderImpl());
         return userService;
-    }
-
-    @Bean
-    public ProxyFactoryBean userService() {
-        ProxyFactoryBean pfBean = new ProxyFactoryBean();
-        pfBean.setTarget(userServiceImpl());
-        pfBean.addAdvisor(transactionAdvisor());
-
-        // 어드바이스와 어드바이저를 동시에 설정해줄 수 있다
-        // 어드바이스 또는 어드바이저로 설정한 빈의 이름들을 넣어주면 된다
-        // pfBean.setInterceptorNames(String args...);
-        return pfBean;
     }
 
     @Bean
@@ -49,9 +37,10 @@ public class AppConfig {
 
     @Bean
     public NameMatchMethodPointcut transactionPointcut() {
-        NameMatchMethodPointcut nameMatchMethodPointcut = new NameMatchMethodPointcut();
-        nameMatchMethodPointcut.setMappedName("upgrade*");
-        return nameMatchMethodPointcut;
+        NameMatchClassMethodPointcut pointcut = new NameMatchClassMethodPointcut();
+        pointcut.setMappedClassName("*ServiceImpl");
+        pointcut.setMappedName("upgrade*");
+        return pointcut;
     }
 
     @Bean

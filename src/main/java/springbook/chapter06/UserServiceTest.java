@@ -6,7 +6,6 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.aop.framework.ProxyFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.test.annotation.DirtiesContext;
@@ -14,10 +13,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import java.lang.reflect.Proxy;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
@@ -34,7 +31,9 @@ import static springbook.chapter05.UserService.MIN_RECOMMEND_FOR_GOLD;
 class UserServiceTest {
 
     @Autowired
-    private UserServiceImpl userServiceImpl;
+    private UserService userServiceImpl;
+    @Autowired
+    private UserService userOnlyTestServiceImpl;
     @Autowired
     private UserDao userDao;
     @Autowired
@@ -119,24 +118,14 @@ class UserServiceTest {
     }
 
     @Test
-    @DirtiesContext
     void upgradeAllOrNothing() throws Exception {
-        UserServiceImpl testUserService = new UserServiceOnlyTest(users.get(3).getId());
-        testUserService.setUserDao(this.userDao);
-        testUserService.setMailSender(this.mailSender);
-
-        ProxyFactoryBean pfBean = context.getBean("&userService", ProxyFactoryBean.class);
-        pfBean.setTarget(testUserService);
-
-        UserService txUserService = (UserService) pfBean.getObject();
-
         this.userDao.deleteAll();
         for(User user : users) {
             this.userDao.add(user);
         }
 
         try {
-            txUserService.upgradeLevels();
+            userOnlyTestServiceImpl.upgradeLevels();
             fail("TestUserException expected");
         } catch (Exception e) {
 
@@ -144,4 +133,5 @@ class UserServiceTest {
 
         checkLevelUpgraded(users.get(1) , false);
     }
+
 }

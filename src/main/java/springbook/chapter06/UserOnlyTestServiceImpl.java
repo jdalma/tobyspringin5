@@ -1,17 +1,10 @@
 package springbook.chapter06;
 
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
-
 import java.util.List;
 
-public class UserServiceOnlyTest extends UserServiceImpl {
+public class UserOnlyTestServiceImpl extends UserServiceImpl {
 
-    private String id;
-
-    public UserServiceOnlyTest(String id) {
-        this.id = id;
-    }
+    private String id = "test3";
 
     @Override
     public void upgradeLevels() {
