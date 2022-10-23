@@ -25,6 +25,9 @@ dependencies {
     implementation("javax.mail:mail:1.4.7")
     implementation("javax.activation:activation:1.1.1")
     implementation("org.mockito:mockito-core:4.8.0")
+    implementation("org.springframework:spring-aop:5.3.23")
+    implementation("org.aopalliance:com.springsource.org.aopalliance:1.0.0")
+
 
     annotationProcessor("org.projectlombok:lombok:1.18.24")
 }
