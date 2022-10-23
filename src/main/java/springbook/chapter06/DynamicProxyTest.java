@@ -5,6 +5,8 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.aop.framework.ProxyFactoryBean;
+import org.springframework.aop.support.DefaultPointcutAdvisor;
+import org.springframework.aop.support.NameMatchMethodPointcut;
 
 import java.lang.reflect.Proxy;
 import java.util.Locale;
@@ -44,5 +46,25 @@ public class DynamicProxyTest {
             String ret = (String) invocation.proceed();
             return ret.toUpperCase(Locale.ROOT);
         }
+    }
+
+    @Test
+    void pointcutAdvisor() {
+        ProxyFactoryBean pfBean = new ProxyFactoryBean();
+        pfBean.setTarget(new HelloTarget());
+
+        // 메소드 이름을 비교해서 대상을 선정하는 알고리즘을 제공하는 포인트컷
+        NameMatchMethodPointcut pointcut = new NameMatchMethodPointcut();
+        // sayH로 시작하는 모든 메소드
+        pointcut.setMappedName("sayH*");
+
+        // 포인트컷과 어드바이스를 Advisor로 묶어서 한 번에 추가
+        pfBean.addAdvisor(new DefaultPointcutAdvisor(pointcut, new UppercaseAdvice()));
+
+        Hello proxiedHello = (Hello) pfBean.getObject();
+
+        Assertions.assertThat(proxiedHello.sayHi("test")).isEqualTo("HI TEST");
+        Assertions.assertThat(proxiedHello.sayHello("test")).isEqualTo("HELLO TEST");
+        Assertions.assertThat(proxiedHello.sayThankYou("test")).isEqualTo("Thank You test");
     }
 }
