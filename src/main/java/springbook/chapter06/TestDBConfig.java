@@ -1,5 +1,8 @@
 package springbook.chapter06;
 
+import org.springframework.aop.framework.ProxyFactoryBean;
+import org.springframework.aop.support.DefaultPointcutAdvisor;
+import org.springframework.aop.support.NameMatchMethodPointcut;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
@@ -25,15 +28,38 @@ public class TestDBConfig {
     }
 
     @Bean
-    public TxProxyFactoryBean userService() {
-        TxProxyFactoryBean proxyFactoryBean = new TxProxyFactoryBean();
-        proxyFactoryBean.setTarget(userServiceImpl());
-        proxyFactoryBean.setTransactionManager(transactionManager());
-        proxyFactoryBean.setPattern("upgradeLevels");
-        proxyFactoryBean.setServiceInterface(UserService.class);
-        return proxyFactoryBean;
+    public ProxyFactoryBean userService() {
+        ProxyFactoryBean pfBean = new ProxyFactoryBean();
+        pfBean.setTarget(userServiceImpl());
+        pfBean.addAdvisor(transactionAdvisor());
+
+        // 어드바이스와 어드바이저를 동시에 설정해줄 수 있다
+        // 어드바이스 또는 어드바이저로 설정한 빈의 이름들을 넣어주면 된다
+        // pfBean.setInterceptorNames(String args...);
+        return pfBean;
     }
 
+    @Bean
+    public TransactionAdvice transactionAdvice() {
+        TransactionAdvice transactionAdvice = new TransactionAdvice();
+        transactionAdvice.setTransactionManager(transactionManager());
+        return transactionAdvice;
+    }
+
+    @Bean
+    public NameMatchMethodPointcut transactionPointcut() {
+        NameMatchMethodPointcut nameMatchMethodPointcut = new NameMatchMethodPointcut();
+        nameMatchMethodPointcut.setMappedName("upgrade*");
+        return nameMatchMethodPointcut;
+    }
+
+    @Bean
+    public DefaultPointcutAdvisor transactionAdvisor() {
+        DefaultPointcutAdvisor defaultPointcutAdvisor = new DefaultPointcutAdvisor();
+        defaultPointcutAdvisor.setAdvice(transactionAdvice());
+        defaultPointcutAdvisor.setPointcut(transactionPointcut());
+        return defaultPointcutAdvisor;
+    }
 
     @Bean
     public PlatformTransactionManager transactionManager() {

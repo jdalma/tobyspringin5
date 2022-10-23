@@ -3,6 +3,7 @@ package springbook.chapter06;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.springframework.aop.framework.ProxyFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
@@ -124,10 +125,10 @@ class UserServiceTest {
         testUserService.setUserDao(this.userDao);
         testUserService.setMailSender(this.mailSender);
 
-        TxProxyFactoryBean txProxyFactoryBean = context.getBean("&userService", TxProxyFactoryBean.class);
-        txProxyFactoryBean.setTarget(testUserService);
+        ProxyFactoryBean pfBean = context.getBean("&userService", ProxyFactoryBean.class);
+        pfBean.setTarget(testUserService);
 
-        UserService txUserService = (UserService) txProxyFactoryBean.getObject();
+        UserService txUserService = (UserService) pfBean.getObject();
 
         this.userDao.deleteAll();
         for(User user : users) {
