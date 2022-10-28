@@ -27,8 +27,9 @@ dependencies {
     implementation("org.mockito:mockito-core:4.8.0")
     implementation("org.springframework:spring-aop:5.3.23")
     implementation("org.aopalliance:com.springsource.org.aopalliance:1.0.0")
+    implementation("org.aspectj:com.springsource.org.aspectj.tools:1.6.0")
 
-
+    runtimeOnly("org.aspectj:aspectjweaver:1.9.6")
     annotationProcessor("org.projectlombok:lombok:1.18.24")
 }
 
