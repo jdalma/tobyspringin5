@@ -26,6 +26,7 @@ dependencies {
     implementation("javax.activation:activation:1.1.1")
     implementation("org.mockito:mockito-core:4.8.0")
     implementation("org.springframework:spring-aop:5.3.23")
+    implementation("org.springframework.boot:spring-boot-starter-aop:2.7.5")
     implementation("org.aopalliance:com.springsource.org.aopalliance:1.0.0")
     implementation("org.aspectj:com.springsource.org.aspectj.tools:1.6.0")
 
