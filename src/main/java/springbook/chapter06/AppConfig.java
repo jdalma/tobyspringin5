@@ -8,9 +8,11 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.mail.MailSender;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.interceptor.TransactionInterceptor;
 import springbook.chapter06.factoryBean.MessageFactoryBean;
 
 import javax.sql.DataSource;
+import java.util.Properties;
 
 @Configuration
 public class AppConfig {
@@ -28,10 +30,16 @@ public class AppConfig {
     }
 
     @Bean
-    public TransactionAdvice transactionAdvice() {
-        TransactionAdvice transactionAdvice = new TransactionAdvice();
-        transactionAdvice.setTransactionManager(transactionManager());
-        return transactionAdvice;
+    public TransactionInterceptor transactionAdvice() {
+        Properties properties = new Properties();
+        properties.setProperty("get*", "PROPAGATION_REQUIRED,readOnly,timeout_30");
+        properties.setProperty("upgrade*", "PROPAGATION_REQUIRED_NEW, ISOLATION_SERIALIZABLE");
+        properties.setProperty("*", "PROPAGATION_REQUIRED");
+
+        TransactionInterceptor interceptor = new TransactionInterceptor();
+        interceptor.setTransactionManager(transactionManager());
+        interceptor.setTransactionAttributes(properties);
+        return interceptor;
     }
 
     @Bean
