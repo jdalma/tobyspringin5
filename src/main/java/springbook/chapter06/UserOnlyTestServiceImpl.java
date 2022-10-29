@@ -18,4 +18,13 @@ public class UserOnlyTestServiceImpl extends UserServiceImpl {
             }
         }
     }
+
+    @Override
+    public List<User> getAll() {
+        List<User> users = userDao.getAll();
+        for(User user : users) {
+            userDao.update(user);
+        }
+        return users;
+    }
 }

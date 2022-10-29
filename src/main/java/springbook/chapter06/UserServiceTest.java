@@ -6,6 +6,7 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.aop.framework.ProxyFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.dao.TransientDataAccessResourceException;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.test.annotation.DirtiesContext;
@@ -17,6 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -134,4 +136,9 @@ class UserServiceTest {
         checkLevelUpgraded(users.get(1) , false);
     }
 
+    @Test
+    void readOnlyTransaction() {
+        assertThatThrownBy(() -> userOnlyTestServiceImpl.getAll())
+                .isInstanceOf(TransientDataAccessResourceException.class);
+    }
 }

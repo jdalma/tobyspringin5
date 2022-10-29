@@ -45,7 +45,7 @@ public class AppConfig {
     @Bean
     public AspectJExpressionPointcut transactionPointcut() {
         AspectJExpressionPointcut pointcut = new AspectJExpressionPointcut();
-        pointcut.setExpression("execution(* *..*ServiceImpl.upgrade*(..))");
+        pointcut.setExpression("execution(* *..*Service.*(..))");
         return pointcut;
     }
 
