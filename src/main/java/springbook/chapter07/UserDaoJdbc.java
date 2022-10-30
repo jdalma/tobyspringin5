@@ -16,9 +16,14 @@ import java.util.List;
 public class UserDaoJdbc implements UserDao {
 
     private JdbcTemplate jdbcTemplate;
+    private SqlService sqlService;
 
     public void setDataSource(DataSource dataSource) {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
+    }
+
+    public void setSqlService(SqlService sqlService) {
+        this.sqlService = sqlService;
     }
 
     private RowMapper<User> userMapper = new RowMapper<User>() {
@@ -38,7 +43,7 @@ public class UserDaoJdbc implements UserDao {
 
     @Override
     public int update(User user) {
-        return this.jdbcTemplate.update("update users set name = ?, password = ?, level = ?, login = ?,recommend = ?, email = ? where id = ?",
+        return this.jdbcTemplate.update(this.sqlService.getSql("userUpdate"),
                 user.getName(),
                 user.getPassword(),
                 user.getLevel().intValue(),
@@ -50,12 +55,12 @@ public class UserDaoJdbc implements UserDao {
 
     @Override
     public List<User> getAll() {
-        return this.jdbcTemplate.query("select * from users order by id", this.userMapper);
+        return this.jdbcTemplate.query(this.sqlService.getSql("userGetAll"), this.userMapper);
     }
 
     @Override
     public int add(final User user) {
-        return this.jdbcTemplate.update("insert into users(id , name , password , level , login , recommend, email) values(?, ?, ?, ?, ?, ?, ?)",
+        return this.jdbcTemplate.update(this.sqlService.getSql("userAdd"),
                                     user.getId(),
                                     user.getName(),
                                     user.getPassword(),
@@ -67,12 +72,12 @@ public class UserDaoJdbc implements UserDao {
 
     @Override
     public int deleteAll() {
-        return this.jdbcTemplate.update("delete from users");
+        return this.jdbcTemplate.update(this.sqlService.getSql("userDeleteAll"));
     }
 
     @Override
     public User get(String id) {
-        return this.jdbcTemplate.queryForObject("select * from users where id = ?",
+        return this.jdbcTemplate.queryForObject(this.sqlService.getSql("userGet"),
                 new Object[]{id},
                 this.userMapper
         );
@@ -80,19 +85,6 @@ public class UserDaoJdbc implements UserDao {
 
     @Override
     public int getCount() {
-        return this.jdbcTemplate.query(
-            new PreparedStatementCreator() {
-                @Override
-                public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                    return con.prepareStatement("select count(*) from users");
-                }
-            },
-            new ResultSetExtractor<Integer>() {
-                public Integer extractData(ResultSet rs) throws SQLException, DataAccessException {
-                    rs.next();
-                    return rs.getInt(1);
-                }
-            }
-        );
+        return this.jdbcTemplate.queryForObject(this.sqlService.getSql("userGetCount"), Integer.class);
     }
 }

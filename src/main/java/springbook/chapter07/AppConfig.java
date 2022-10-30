@@ -79,7 +79,13 @@ public class AppConfig {
     public UserDaoJdbc userDao(){
         UserDaoJdbc dao = new UserDaoJdbc();
         dao.setDataSource(dataSource());
+        dao.setSqlService(sqlService());
         return dao;
+    }
+
+    @Bean
+    public SimpleSqlService sqlService() {
+        return new SimpleSqlService();
     }
 
     @Bean

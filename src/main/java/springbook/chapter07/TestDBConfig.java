@@ -81,10 +81,16 @@ public class TestDBConfig {
     }
 
     @Bean
-    public UserDao userDao(){
+    public UserDaoJdbc userDao(){
         UserDaoJdbc dao = new UserDaoJdbc();
         dao.setDataSource(dataSource());
+        dao.setSqlService(sqlService());
         return dao;
+    }
+
+    @Bean
+    public SqlService sqlService() {
+        return new SimpleSqlService();
     }
 
     @Bean
