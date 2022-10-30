@@ -29,6 +29,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-aop:2.7.5")
     implementation("org.aopalliance:com.springsource.org.aopalliance:1.0.0")
     implementation("org.aspectj:com.springsource.org.aspectj.tools:1.6.0")
+    implementation("javax.xml.bind:jaxb-api:2.3.1")
+
 
     runtimeOnly("org.aspectj:aspectjweaver:1.9.6")
     annotationProcessor("org.projectlombok:lombok:1.18.24")
