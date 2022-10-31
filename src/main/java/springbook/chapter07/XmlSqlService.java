@@ -3,6 +3,7 @@ package springbook.chapter07;
 import springbook.chapter07.jaxb.SqlType;
 import springbook.chapter07.jaxb.Sqlmap;
 
+import javax.annotation.PostConstruct;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -13,13 +14,19 @@ import java.util.Map;
 public class XmlSqlService implements SqlService {
 
     private final Map<String , String> sqlMap = new HashMap<>();
+    private String sqlmapFile;
 
-    public XmlSqlService() {
+    public void setSqlmapFile(String sqlmapFile) {
+        this.sqlmapFile = sqlmapFile;
+    }
+
+    @PostConstruct
+    private void loadSql() {
         String contextPath = Sqlmap.class.getPackage().getName();
         try {
             JAXBContext jaxbContext = JAXBContext.newInstance(contextPath);
             Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-            InputStream is = ClassLoader.class.getResourceAsStream("/sqlmap.xml");
+            InputStream is = ClassLoader.class.getResourceAsStream("/" + sqlmapFile);
             Sqlmap sqlmap = (Sqlmap) unmarshaller.unmarshal(is);
 
             for (SqlType sql : sqlmap.getSql()) {
