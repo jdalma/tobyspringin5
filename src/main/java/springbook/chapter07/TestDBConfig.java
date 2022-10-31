@@ -90,7 +90,7 @@ public class TestDBConfig {
 
     @Bean
     public SqlService sqlService() {
-        return new SimpleSqlService();
+        return new XmlSqlService();
     }
 
     @Bean
