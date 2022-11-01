@@ -94,10 +94,10 @@ public class TestDBConfig {
 
     @Bean
     public SqlService sqlService() {
-        BaseSqlService sqlService = new BaseSqlService();
-        sqlService.setSqlReader(jaxbXmlSqlReader());
-        sqlService.setSqlRegistry(hashMapSqlRegistry());
-        return sqlService;
+//        BaseSqlService sqlService = new BaseSqlService();
+//        sqlService.setSqlReader(jaxbXmlSqlReader());
+//        sqlService.setSqlRegistry(hashMapSqlRegistry());
+        return new DefaultSqlService();
     }
 
     @Bean
@@ -108,7 +108,6 @@ public class TestDBConfig {
     @Bean
     public SqlReader jaxbXmlSqlReader() {
         JaxbXmlSqlReader jaxbXmlSqlReader = new JaxbXmlSqlReader();
-        jaxbXmlSqlReader.setSqlmapFile("sqlmap.xml");
         return jaxbXmlSqlReader;
     }
 

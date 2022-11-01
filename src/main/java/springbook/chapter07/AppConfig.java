@@ -103,7 +103,6 @@ public class AppConfig {
     @Bean
     public SqlReader jaxbXmlSqlReader() {
         JaxbXmlSqlReader jaxbXmlSqlReader = new JaxbXmlSqlReader();
-        jaxbXmlSqlReader.setSqlmapFile("sqlmap.xml");
         return jaxbXmlSqlReader;
     }
 

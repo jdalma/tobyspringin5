@@ -8,8 +8,8 @@ import javax.annotation.PostConstruct;
 
 public class BaseSqlService implements SqlService {
 
-    private SqlReader sqlReader;
-    private SqlRegistry sqlRegistry;
+    protected SqlReader sqlReader;
+    protected SqlRegistry sqlRegistry;
 
     public void setSqlReader(SqlReader sqlReader) {
         this.sqlReader = sqlReader;
