@@ -11,6 +11,10 @@ import org.springframework.mail.MailSender;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.interceptor.TransactionInterceptor;
 import springbook.chapter06.DummyMailSender;
+import springbook.chapter07.sqlService.HashMapSqlRegistry;
+import springbook.chapter07.sqlService.JaxbXmlSqlReader;
+import springbook.chapter07.sqlService.SqlReader;
+import springbook.chapter07.sqlService.SqlRegistry;
 
 import javax.sql.DataSource;
 import java.util.Properties;
@@ -90,11 +94,22 @@ public class TestDBConfig {
 
     @Bean
     public SqlService sqlService() {
-        XmlSqlService sqlService = new XmlSqlService();
-        sqlService.setSqlmapFile("sqlmap.xml");
-        sqlService.setSqlReader(sqlService);
-        sqlService.setSqlRegistry(sqlService);
+        BaseSqlService sqlService = new BaseSqlService();
+        sqlService.setSqlReader(jaxbXmlSqlReader());
+        sqlService.setSqlRegistry(hashMapSqlRegistry());
         return sqlService;
+    }
+
+    @Bean
+    public SqlRegistry hashMapSqlRegistry() {
+        return new HashMapSqlRegistry();
+    }
+
+    @Bean
+    public SqlReader jaxbXmlSqlReader() {
+        JaxbXmlSqlReader jaxbXmlSqlReader = new JaxbXmlSqlReader();
+        jaxbXmlSqlReader.setSqlmapFile("sqlmap.xml");
+        return jaxbXmlSqlReader;
     }
 
     @Bean

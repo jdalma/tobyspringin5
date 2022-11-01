@@ -11,6 +11,10 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.interceptor.TransactionInterceptor;
 import springbook.chapter06.DummyMailSender;
 import springbook.chapter06.factoryBean.MessageFactoryBean;
+import springbook.chapter07.sqlService.HashMapSqlRegistry;
+import springbook.chapter07.sqlService.JaxbXmlSqlReader;
+import springbook.chapter07.sqlService.SqlReader;
+import springbook.chapter07.sqlService.SqlRegistry;
 
 import javax.sql.DataSource;
 import java.util.Properties;
@@ -84,8 +88,23 @@ public class AppConfig {
     }
 
     @Bean
-    public SimpleSqlService sqlService() {
-        return new SimpleSqlService();
+    public SqlService sqlService() {
+        BaseSqlService sqlService = new BaseSqlService();
+        sqlService.setSqlReader(jaxbXmlSqlReader());
+        sqlService.setSqlRegistry(hashMapSqlRegistry());
+        return sqlService;
+    }
+
+    @Bean
+    public SqlRegistry hashMapSqlRegistry() {
+        return new HashMapSqlRegistry();
+    }
+
+    @Bean
+    public SqlReader jaxbXmlSqlReader() {
+        JaxbXmlSqlReader jaxbXmlSqlReader = new JaxbXmlSqlReader();
+        jaxbXmlSqlReader.setSqlmapFile("sqlmap.xml");
+        return jaxbXmlSqlReader;
     }
 
     @Bean
