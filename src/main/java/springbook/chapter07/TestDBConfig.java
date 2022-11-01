@@ -92,6 +92,8 @@ public class TestDBConfig {
     public SqlService sqlService() {
         XmlSqlService sqlService = new XmlSqlService();
         sqlService.setSqlmapFile("sqlmap.xml");
+        sqlService.setSqlReader(sqlService);
+        sqlService.setSqlRegistry(sqlService);
         return sqlService;
     }
 
