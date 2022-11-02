@@ -8,6 +8,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.mail.MailSender;
+import org.springframework.oxm.Unmarshaller;
+import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.interceptor.TransactionInterceptor;
 import springbook.chapter06.DummyMailSender;
@@ -109,6 +111,13 @@ public class TestDBConfig {
     public SqlReader jaxbXmlSqlReader() {
         JaxbXmlSqlReader jaxbXmlSqlReader = new JaxbXmlSqlReader();
         return jaxbXmlSqlReader;
+    }
+
+    @Bean
+    public Unmarshaller unmarshaller() {
+        Jaxb2Marshaller jaxb2Marshaller = new Jaxb2Marshaller();
+        jaxb2Marshaller.setContextPath("springbook.chapter07.jaxb");
+        return jaxb2Marshaller;
     }
 
     @Bean

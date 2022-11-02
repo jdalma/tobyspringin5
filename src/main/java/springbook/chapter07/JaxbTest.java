@@ -1,19 +1,37 @@
 package springbook.chapter07;
 
-import jdk.nashorn.internal.runtime.regexp.joni.Config;
 import org.junit.jupiter.api.Test;
-import org.springframework.util.ResourceUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import springbook.chapter07.jaxb.SqlType;
 import springbook.chapter07.jaxb.Sqlmap;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
+import java.io.IOException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 
+@SpringJUnitConfig(AppConfig.class)
+@ContextConfiguration(classes = TestDBConfig.class)
 public class JaxbTest {
+    @Autowired
+    org.springframework.oxm.Unmarshaller unmarshaller;
+
+    @Test
+    void unmarshallerSqlmap() throws IOException {
+        Source xmlSource = new StreamSource(this.getClass().getResourceAsStream("/sqlmap.xml"));
+        // 어떤 OXM기술이든 해당 한 줄이면 끝난다
+        Sqlmap sqlmap = (Sqlmap) this.unmarshaller.unmarshal(xmlSource);
+
+        List<SqlType> sqlList = sqlmap.getSql();
+        assertThat(sqlList).hasSize(6);
+    }
 
     @Test
     void readSqlmap() throws JAXBException {
