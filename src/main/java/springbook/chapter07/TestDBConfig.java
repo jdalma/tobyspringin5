@@ -15,6 +15,7 @@ import org.springframework.transaction.interceptor.TransactionInterceptor;
 import springbook.chapter06.DummyMailSender;
 import springbook.chapter07.sqlService.HashMapSqlRegistry;
 import springbook.chapter07.sqlService.JaxbXmlSqlReader;
+import springbook.chapter07.sqlService.OxmSqlService;
 import springbook.chapter07.sqlService.SqlReader;
 import springbook.chapter07.sqlService.SqlRegistry;
 
@@ -96,10 +97,9 @@ public class TestDBConfig {
 
     @Bean
     public SqlService sqlService() {
-//        BaseSqlService sqlService = new BaseSqlService();
-//        sqlService.setSqlReader(jaxbXmlSqlReader());
-//        sqlService.setSqlRegistry(hashMapSqlRegistry());
-        return new DefaultSqlService();
+        OxmSqlService sqlService = new OxmSqlService();
+        sqlService.setUnmarshaller(unmarshaller());
+        return sqlService;
     }
 
     @Bean

@@ -15,6 +15,7 @@ import springbook.chapter06.DummyMailSender;
 import springbook.chapter06.factoryBean.MessageFactoryBean;
 import springbook.chapter07.sqlService.HashMapSqlRegistry;
 import springbook.chapter07.sqlService.JaxbXmlSqlReader;
+import springbook.chapter07.sqlService.OxmSqlService;
 import springbook.chapter07.sqlService.SqlReader;
 import springbook.chapter07.sqlService.SqlRegistry;
 
@@ -91,9 +92,8 @@ public class AppConfig {
 
     @Bean
     public SqlService sqlService() {
-        BaseSqlService sqlService = new BaseSqlService();
-        sqlService.setSqlReader(jaxbXmlSqlReader());
-        sqlService.setSqlRegistry(hashMapSqlRegistry());
+        OxmSqlService sqlService = new OxmSqlService();
+        sqlService.setUnmarshaller(unmarshaller());
         return sqlService;
     }
 
