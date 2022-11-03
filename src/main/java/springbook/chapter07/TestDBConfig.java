@@ -13,6 +13,7 @@ import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.interceptor.TransactionInterceptor;
 import springbook.chapter06.DummyMailSender;
+import springbook.chapter07.sqlService.ConcurrentHashMapSqlRegistry;
 import springbook.chapter07.sqlService.HashMapSqlRegistry;
 import springbook.chapter07.sqlService.JaxbXmlSqlReader;
 import springbook.chapter07.sqlService.OxmSqlService;
@@ -99,12 +100,13 @@ public class TestDBConfig {
     public SqlService sqlService() {
         OxmSqlService sqlService = new OxmSqlService();
         sqlService.setUnmarshaller(unmarshaller());
+        sqlService.setSqlRegistry(sqlRegistry());
         return sqlService;
     }
 
     @Bean
-    public SqlRegistry hashMapSqlRegistry() {
-        return new HashMapSqlRegistry();
+    public SqlRegistry sqlRegistry() {
+        return new ConcurrentHashMapSqlRegistry();
     }
 
     @Bean

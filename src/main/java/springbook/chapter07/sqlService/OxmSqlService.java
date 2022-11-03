@@ -16,7 +16,7 @@ import java.io.IOException;
 
 public class OxmSqlService implements SqlService {
     private final BaseSqlService baseSqlService = new BaseSqlService();
-    private final SqlRegistry sqlRegistry = new HashMapSqlRegistry();
+    private SqlRegistry sqlRegistry = new HashMapSqlRegistry();
 
     // OxmSqlService와 OxmSqlReader는 강합게 결합되어 있다
     private final OxmSqlReader oxmSqlReader = new OxmSqlReader();
@@ -67,5 +67,9 @@ public class OxmSqlService implements SqlService {
 
     public void setSqlmapFile(Resource sqlmap) {
         this.oxmSqlReader.setSqlmapFile(sqlmap);
+    }
+
+    public void setSqlRegistry(SqlRegistry sqlRegistry) {
+        this.sqlRegistry = sqlRegistry;
     }
 }
