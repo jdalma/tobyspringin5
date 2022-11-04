@@ -13,8 +13,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.interceptor.TransactionInterceptor;
 import springbook.chapter06.DummyMailSender;
 import springbook.chapter06.factoryBean.MessageFactoryBean;
-import springbook.chapter07.sqlService.ConcurrentHashMapSqlRegistry;
-import springbook.chapter07.sqlService.HashMapSqlRegistry;
+import springbook.chapter07.sqlService.EmbeddedDbSqlRegistry;
 import springbook.chapter07.sqlService.JaxbXmlSqlReader;
 import springbook.chapter07.sqlService.OxmSqlService;
 import springbook.chapter07.sqlService.SqlReader;
@@ -101,7 +100,7 @@ public class AppConfig {
 
     @Bean
     public SqlRegistry sqlRegistry() {
-        return new ConcurrentHashMapSqlRegistry();
+        return new EmbeddedDbSqlRegistry();
     }
 
     @Bean
