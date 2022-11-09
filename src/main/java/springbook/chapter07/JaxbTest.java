@@ -2,7 +2,6 @@ package springbook.chapter07;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import springbook.chapter07.jaxb.SqlType;
 import springbook.chapter07.jaxb.Sqlmap;
@@ -17,7 +16,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 
-@SpringJUnitConfig(classes = TestDBConfig.class)
+@SpringJUnitConfig(classes = AppContext.class)
 public class JaxbTest {
     @Autowired
     org.springframework.oxm.Unmarshaller unmarshaller;

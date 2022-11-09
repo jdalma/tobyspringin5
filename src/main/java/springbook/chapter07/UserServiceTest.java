@@ -9,7 +9,6 @@ import org.springframework.dao.TransientDataAccessResourceException;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
@@ -26,8 +25,7 @@ import static org.mockito.Mockito.verify;
 import static springbook.chapter07.UserServiceImpl.MIN_LOGIN_COUNT_FOR_SILVER;
 import static springbook.chapter07.UserServiceImpl.MIN_RECOMMEND_FOR_GOLD;
 
-@SpringJUnitConfig(classes = TestDBConfig.class)
-@SpringBootApplication
+@SpringJUnitConfig(classes = {AppContext.class, TestAppContext.class})
 class UserServiceTest {
 
     @Autowired
@@ -135,10 +133,12 @@ class UserServiceTest {
 }
 
 class TestUserService extends UserServiceImpl {
-    private String id = "test3"; // users(3).getId()
+    private String id = "test4"; // users(3).getId()
 
     public void upgradeLevel(User user) {
-        if (user.getId().equals(this.id)) throw new TestUserServiceException();
+        if (user.getId().equals(this.id)) {
+            throw new TestUserServiceException();
+        }
         super.upgradeLevel(user);
     }
 
