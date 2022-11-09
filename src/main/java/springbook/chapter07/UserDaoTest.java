@@ -17,8 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 
-@SpringJUnitConfig(AppConfig.class)
-@ContextConfiguration(classes = TestDBConfig.class)
+@SpringJUnitConfig(classes = TestDBConfig.class)
 public class UserDaoTest {
 
     @Autowired

@@ -4,11 +4,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.dao.TransientDataAccessResourceException;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
@@ -25,17 +26,16 @@ import static org.mockito.Mockito.verify;
 import static springbook.chapter07.UserServiceImpl.MIN_LOGIN_COUNT_FOR_SILVER;
 import static springbook.chapter07.UserServiceImpl.MIN_RECOMMEND_FOR_GOLD;
 
-@SpringJUnitConfig(AppConfig.class)
-@ContextConfiguration(classes = TestDBConfig.class)
+@SpringJUnitConfig(classes = TestDBConfig.class)
+@SpringBootApplication
 class UserServiceTest {
 
     @Autowired
-    private UserService userServiceImpl;
+    private UserService userService;
     @Autowired
     private UserService userOnlyTestServiceImpl;
     @Autowired
     private UserDao userDao;
-
     private List<User> users;
 
     @BeforeEach
@@ -100,8 +100,8 @@ class UserServiceTest {
         User userWithoutLevel = users.get(0);
         userWithLevel.setLevel(null);
 
-        userServiceImpl.add(userWithLevel);
-        userServiceImpl.add(userWithoutLevel);
+        userService.add(userWithLevel);
+        userService.add(userWithoutLevel);
 
         User userWithLevelRead = userDao.get(userWithLevel.getId());
         User userWithoutLevelRead = userDao.get(userWithoutLevel.getId());
@@ -129,7 +129,23 @@ class UserServiceTest {
 
     @Test
     void readOnlyTransaction() {
-        assertThatThrownBy(() -> userOnlyTestServiceImpl.getAll())
+        assertThatThrownBy(userOnlyTestServiceImpl::getAll)
                 .isInstanceOf(TransientDataAccessResourceException.class);
+    }
+}
+
+class TestUserService extends UserServiceImpl {
+    private String id = "test3"; // users(3).getId()
+
+    public void upgradeLevel(User user) {
+        if (user.getId().equals(this.id)) throw new TestUserServiceException();
+        super.upgradeLevel(user);
+    }
+
+    public List<User> getAll() {
+        for(User user : super.getAll()) {
+            super.update(user);
+        }
+        return null;
     }
 }

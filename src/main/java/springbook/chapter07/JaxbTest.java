@@ -17,8 +17,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 
-@SpringJUnitConfig(AppConfig.class)
-@ContextConfiguration(classes = TestDBConfig.class)
+@SpringJUnitConfig(classes = TestDBConfig.class)
 public class JaxbTest {
     @Autowired
     org.springframework.oxm.Unmarshaller unmarshaller;

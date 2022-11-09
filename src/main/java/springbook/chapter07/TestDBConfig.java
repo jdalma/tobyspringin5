@@ -1,6 +1,8 @@
 package springbook.chapter07;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
@@ -23,59 +25,22 @@ import javax.sql.DataSource;
 
 @Configuration
 @EnableTransactionManagement
+@ComponentScan(basePackages = "springbook.chapter07")
 public class TestDBConfig {
 
     private final String URL = "jdbc:mysql://localhost/springbook?characterEncoding=UTF-8";
     private final String ID = "spring";
     private final String PASSWORD = "book";
 
-    @Bean
-    public UserService userServiceImpl() {
-        UserServiceImpl userService = new UserServiceImpl();
-        userService.setUserDao(userDao());
-        userService.setMailSender(mailSenderImpl());
-        return userService;
-    }
+    @Autowired UserDao userDao;
 
     @Bean
     public UserService userOnlyTestServiceImpl() {
-        UserOnlyTestServiceImpl userService = new UserOnlyTestServiceImpl();
-        userService.setUserDao(userDao());
-        userService.setMailSender(mailSenderImpl());
-        return userService;
+        TestUserService testService = new TestUserService();
+        testService.setUserDao(this.userDao);
+        testService.setMailSender(mailSenderImpl());
+        return testService;
     }
-
-//    @Bean
-//    public DefaultAdvisorAutoProxyCreator defaultAdvisorAutoProxyCreator() {
-//        return new DefaultAdvisorAutoProxyCreator();
-//    }
-//
-//    @Bean
-//    public TransactionInterceptor transactionAdvice() {
-//        Properties properties = new Properties();
-//        properties.setProperty("get*", "PROPAGATION_REQUIRED,readOnly,timeout_30");
-//        properties.setProperty("upgrade*", "PROPAGATION_REQUIRES_NEW, ISOLATION_SERIALIZABLE");
-//        properties.setProperty("*", "PROPAGATION_REQUIRED");
-//
-//        TransactionInterceptor interceptor = new TransactionInterceptor();
-//        interceptor.setTransactionManager(transactionManager());
-//        interceptor.setTransactionAttributes(properties);
-//        return interceptor;
-//    }
-//
-//    @Bean
-//    public AspectJExpressionPointcut transactionPointcut() {
-//        AspectJExpressionPointcut pointcut = new AspectJExpressionPointcut();
-//        pointcut.setExpression("execution(* *..*Service.*(..))");
-//        return pointcut;
-//    }
-//    @Bean
-//    public DefaultPointcutAdvisor transactionAdvisor() {
-//        DefaultPointcutAdvisor defaultPointcutAdvisor = new DefaultPointcutAdvisor();
-//        defaultPointcutAdvisor.setAdvice(transactionAdvice());
-//        defaultPointcutAdvisor.setPointcut(transactionPointcut());
-//        return defaultPointcutAdvisor;
-//    }
 
     @Bean
     public PlatformTransactionManager transactionManager() {
@@ -85,14 +50,6 @@ public class TestDBConfig {
     @Bean
     public MailSender mailSenderImpl() {
         return new DummyMailSender();
-    }
-
-    @Bean
-    public UserDaoJdbc userDao(){
-        UserDaoJdbc dao = new UserDaoJdbc();
-        dao.setDataSource(dataSource());
-        dao.setSqlService(sqlService());
-        return dao;
     }
 
     @Bean
