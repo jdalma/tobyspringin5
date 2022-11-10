@@ -1,7 +1,9 @@
 package springbook.chapter07;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
@@ -9,15 +11,21 @@ import org.springframework.oxm.Unmarshaller;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import springbook.chapter07.sqlService.EmbeddedDbSqlRegistry;
 import springbook.chapter07.sqlService.OxmSqlService;
+import springbook.chapter07.sqlService.SqlMapConfig;
 import springbook.chapter07.sqlService.SqlRegistry;
 
 @Configuration
 public class SqlServiceContext {
+
+    @Autowired
+    SqlMapConfig sqlMapConfig;
+
     @Bean
     public SqlService sqlService() {
         OxmSqlService sqlService = new OxmSqlService();
         sqlService.setUnmarshaller(unmarshaller());
         sqlService.setSqlRegistry(sqlRegistry());
+        sqlService.setSqlmapFile(this.sqlMapConfig.getSqlMapResource());
         return sqlService;
     }
 

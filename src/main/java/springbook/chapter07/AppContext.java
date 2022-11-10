@@ -16,14 +16,17 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import springbook.chapter06.DummyMailSender;
+import springbook.chapter07.sqlService.EnableSqlService;
+import springbook.chapter07.sqlService.SqlMapConfig;
+import springbook.chapter07.sqlService.UserSqlMapConfig;
 
 import javax.sql.DataSource;
 import java.sql.Driver;
 
 @Configuration
 @EnableTransactionManagement
+@EnableSqlService
 @ComponentScan(basePackages = "springbook.chapter07")
-@Import(SqlServiceContext.class)
 @PropertySource("/database.properties")
 public class AppContext {
 
@@ -31,6 +34,11 @@ public class AppContext {
     @Value("${db.url}") String url;
     @Value("${db.username}") String username;
     @Value("${db.password}") String password;
+
+    @Bean
+    public SqlMapConfig sqlMapConfig() {
+        return new UserSqlMapConfig();
+    }
 
     @Bean
     public PlatformTransactionManager transactionManager() {
