@@ -6,6 +6,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.mail.MailSender;
@@ -15,16 +17,17 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import springbook.chapter06.DummyMailSender;
 
 import javax.sql.DataSource;
+import java.sql.Driver;
 
 @Configuration
 @EnableTransactionManagement
 @ComponentScan(basePackages = "springbook.chapter07")
 @Import(SqlServiceContext.class)
+@PropertySource("database.properties")
 public class AppContext {
 
-    private final String URL = "jdbc:mysql://localhost/springbook?characterEncoding=UTF-8";
-    private final String ID = "spring";
-    private final String PASSWORD = "book";
+    @Autowired
+    Environment env;
 
     @Bean
     public PlatformTransactionManager transactionManager() {
@@ -34,11 +37,15 @@ public class AppContext {
     @Bean
     public DataSource dataSource(){
         SimpleDriverDataSource dataSource = new SimpleDriverDataSource();
+        try {
+            dataSource.setDriverClass((Class<? extends Driver>) Class.forName(env.getProperty("db.driverClass")));
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
 
-        dataSource.setDriverClass(com.mysql.cj.jdbc.Driver.class);
-        dataSource.setUrl(URL);
-        dataSource.setUsername(ID);
-        dataSource.setPassword(PASSWORD);
+        dataSource.setUrl(env.getProperty("db.url"));
+        dataSource.setUsername(env.getProperty("db.username"));
+        dataSource.setPassword(env.getProperty("db.password"));
 
         return dataSource;
     }
