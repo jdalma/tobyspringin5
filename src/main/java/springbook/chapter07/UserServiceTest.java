@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.dao.TransientDataAccessResourceException;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,7 +26,8 @@ import static org.mockito.Mockito.verify;
 import static springbook.chapter07.UserServiceImpl.MIN_LOGIN_COUNT_FOR_SILVER;
 import static springbook.chapter07.UserServiceImpl.MIN_RECOMMEND_FOR_GOLD;
 
-@SpringJUnitConfig(classes = {AppContext.class, TestAppContext.class})
+@SpringJUnitConfig(classes = AppContext.class)
+@ActiveProfiles("test")
 class UserServiceTest {
 
     @Autowired
