@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.dao.TransientDataAccessResourceException;
 import org.springframework.mail.MailSender;
@@ -31,6 +32,8 @@ import static springbook.chapter07.UserServiceImpl.MIN_RECOMMEND_FOR_GOLD;
 class UserServiceTest {
 
     @Autowired
+    private DefaultListableBeanFactory bf;
+    @Autowired
     private UserService userService;
     @Autowired
     private UserService userOnlyTestServiceImpl;
@@ -47,6 +50,13 @@ class UserServiceTest {
                 new User("test4", "test4", "test4", Level.SILVER, 60, MIN_RECOMMEND_FOR_GOLD , "test4"),
                 new User("test5", "test5", "test5", Level.GOLD, 100, 100, "test5")
         );
+    }
+
+    @Test
+    void beans() {
+        for (String bean : bf.getBeanDefinitionNames()) {
+            System.out.printf("%s : %s%n", bean , bf.getBean(bean));
+        }
     }
 
     @Test
